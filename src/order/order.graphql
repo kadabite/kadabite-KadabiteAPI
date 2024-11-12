@@ -1,0 +1,59 @@
+type Mutation {
+  createOrder(
+    sellerId: ID!
+    dispatcherId: ID
+    deliveryAddress: String!
+    orderItems: [OrderItems]!
+  ): Message!
+  deleteAnOrderItem(orderId: ID!, orderItemId: ID!): Message!
+  deleteOrder(orderId: ID!): Message!
+  deleteOrderItemsNow(ids: [ID]!): Message!
+  updateOrder(orderId: ID!, status: String!): Message!
+  updateOrderItems(orderId: ID!, orderItems: [OrderItem2]!): Message!
+}
+
+type Order {
+  currency: String!
+  deliveryAddress: String!
+  dispatcherId: ID
+  id: ID!
+  orderDateTime: String!
+  orderItems: [String]!
+  payment: [Payment]
+  paymentToken: String
+  sellerId: ID!
+  status: String!
+  timeOfDelivery: String
+  totalAmount: Int!
+}
+
+type OrderItem {
+  comments: String
+  id: ID!
+  productId: ID!
+  quantity: Int
+  ratings: Int
+}
+
+input OrderItem2 {
+  comments: String
+  id: ID!
+  quantity: Int
+  ratings: Int
+}
+
+input OrderItems {
+  comments: String
+  productId: ID!
+  quantity: Int
+  ratings: Int
+}
+
+type Query {
+  getAllOrders: Message!
+  getAnOrderItem(orderItemId: ID!): Message!
+  getMyOrderItems(orderId: ID!): Message!
+  getMyOrders: Message!
+  getTheOrderAsDispatcher: Message!
+  getTheOrderAsSeller: Message!
+}

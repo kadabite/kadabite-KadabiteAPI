@@ -1,0 +1,16 @@
+type Category {
+  id: ID!
+  name: String!
+  products: [Product]
+}
+
+type Mutation {
+  createCategories(name: [String!]!): Message!
+  createCategory(name: String!): Message!
+  deleteCategory(id: ID!): Message!
+}
+
+type Query {
+  categories: Message!
+  category(id: ID!): Message!
+}

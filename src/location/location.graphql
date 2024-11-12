@@ -1,0 +1,53 @@
+type Country {
+  id: ID!
+  name: String!
+  states: [State]
+}
+
+type Lga {
+  id: ID!
+  name: String!
+  state: State
+}
+
+type Location {
+  id: ID
+  name: String
+  longitude: String
+  latitude: String
+}
+
+type Mutation {
+  addUserLocation(
+    address: String!
+    lga: String
+    state: String
+    country: String
+    longitude: String
+    latitude: String
+  ): Message!
+  createLocation(location: String!): Message!
+  deleteUserLocation(locationId: ID!): Message!
+  updateUserLocation(
+    locationId: ID!
+    address: String!
+    lga: String!
+    state: String!
+    country: String!
+    longitude: String!
+    latitude: String!
+  ): Message!
+}
+
+type Query {
+  getCountries: Message!
+  getLgas(state: String!): Message!
+  getStates(country: String!): Message!
+  getUserLocations: Message!
+}
+
+type State {
+  id: ID!
+  name: String!
+  country: Country
+}

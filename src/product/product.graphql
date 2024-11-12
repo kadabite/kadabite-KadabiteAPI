@@ -1,0 +1,41 @@
+type Mutation {
+  createProduct(
+    name: String!,
+    description: String!,
+    price: Int!,
+    currency: String!,
+    categoryId: ID!): Message!
+  deleteProduct(id: ID!): Message!
+  updateProduct(
+    orderId: ID!,
+    deliveryAddress: String!,
+    recievedByBuyer: Boolean,
+    deliveredByDispatcher: Boolean): Message!
+}
+
+type Product {
+  categoryId: String
+  createdAt: String!
+  currency: String!
+  description: String!
+  id: ID!
+  name: String!
+  photo: String
+  price: Int!
+  updatedAt: String!
+}
+
+type Query {
+  getAllProducts: Message!
+  getAllProductsOfUsersByCategory(categoryId: ID!): Message!
+  getProduct(id: ID!): Message!
+  getUserProducts: Message!
+}
+
+input updateProduct {
+  currency: String,
+  description: String
+  name: String
+  photo: String
+  price: Int
+}

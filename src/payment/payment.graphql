@@ -1,0 +1,43 @@
+type Mutation {
+  createPayment(
+    orderId: ID!
+    paymentMethod: String!
+    currency: String!
+    sellerAmount: Int!
+    dispatcherAmount: Int!
+  ): Message!
+  updatePayment(
+    paymentId: ID!
+    status: String!
+  ): Message!
+}
+
+type Payment {
+  currency: String!
+  dispatcherAmount: Int!
+  dispatcherPaymentStatus: String!
+  id: ID!
+  orderId: ID!
+  paymentDateTime: String!
+  paymentMethod: String
+  paymentStatus: String!
+  sellerAmount: Int!
+  sellerPaymentStatus: String!
+  totalAmount: Int!
+}
+
+type Payments {
+  currency: String!
+  dispatcherAmount: Int!
+  dispatcherPaymentStatus: String!
+  id: ID!
+  lastUpdateTime: String!
+  paymentDateTime: String
+  paymentMethod: String!
+  sellerAmount: Int!
+  sellerPaymentStatus: String!
+}
+
+type Query {
+  getMyPayment(orderId: ID!): Message!
+}

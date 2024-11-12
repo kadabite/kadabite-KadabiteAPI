@@ -1,0 +1,133 @@
+type Message {
+  categoriesData: [Category]
+  categoryData: Category
+  countriesData: [Country]
+  countryData: Country
+  foodsData: [Restaurant]
+  id: ID
+  lgasData: [Lga]
+  locationsData: [Location]
+  message: String
+  ok: Boolean!
+  orderData: Order
+  orderItemData: OrderItem
+  orderItemsData: [OrderItem]
+  ordersData: [Order]
+  paymentData: Payment
+  paymentsData: [Payment]
+  productData: Product
+  productsData: [Product]
+  refreshToken: String
+  statesData: [State]
+  statusCode: Int!
+  token: String
+  userData: User
+  usersData: [Users]
+}
+
+type Mutation {
+  createUser(
+    email: String
+    password: String!
+    phoneNumber: String
+  ): Message!
+  deleteUser: Message!
+  forgotPassword(email: String!): Message!
+  login(email: String!, password: String!): Message!
+  logout: Message!
+  registerUser(
+    firstName: String!
+    lastName: String!
+    username: String!
+    userType: String!
+    email: String!
+    phoneNumber: String!
+    longitude: String
+    latitude: String
+    lga: String!
+    state: String!
+    country: String!
+    address: String!
+    vehicleNumber: String
+  ): Message!
+  updatePassword(email: String!, token: String!, password: String!): Message!
+  updateUser(
+    firstName: String
+    lastName: String
+    longitude: String
+    latitude: String
+    userName: String
+    lga: String
+    state: String
+    country: String
+    address: String
+    buyerStatus: String
+    sellerStatus: String
+    dispatcherStatus: String
+    vehicleNumber: String
+  ): Message!
+}
+
+type Query {
+  findFoods(productName: String!): Message!
+  findRestaurants(username: String): Message!
+  thirdPartyUser(username: String!): ThirdPartyUser!
+  user: Message!
+  users: Message!
+}
+
+type Restaurant {
+  addressSeller: [Location]
+  businessDescription: String
+  createdAt: String!
+  currency: String
+  description: String
+  email: String!
+  id: ID!
+  name: String!
+  phoneNumber: String
+  photo: String
+  price: Float
+  products: [String]!
+  userId: ID!
+  username: String!
+}
+
+type ThirdPartyUser {
+  email: String!
+  passwordHash: String!
+  username: String!
+}
+
+type User {
+  addressBuyer: [Location]
+  addressDispatcher: [Location]
+  addressSeller: [Location]
+  buyerStatus: String
+  businessDescription: String
+  createdAt: String!
+  dispatcherStatus: String
+  email: String
+  firstName: String
+  id: ID!
+  isDeleted: Boolean
+  isLoggedIn: Boolean
+  lastName: String
+  locations: [String]!
+  phoneNumber: String
+  photo: String
+  products: [String]!
+  sellerStatus: String
+  updatedAt: String!
+  userType: String
+  username: String
+}
+
+type Users {
+  email: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
+  role: String!
+  username: String
+}
