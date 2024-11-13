@@ -1,6 +1,13 @@
-import { CreatePaymentInput } from './create-payment.input';
-import { PartialType } from '@nestjs/mapped-types';
+import { InputType, Field, ID } from '@nestjs/graphql';
+import { IsString, IsUUID } from 'class-validator';
 
-export class UpdatePaymentInput extends PartialType(CreatePaymentInput) {
-  id: number;
+@InputType()
+export class UpdatePaymentInput {
+  @Field(() => ID)
+  @IsUUID()
+  paymentId: string;
+
+  @Field()
+  @IsString()
+  status: string;
 }

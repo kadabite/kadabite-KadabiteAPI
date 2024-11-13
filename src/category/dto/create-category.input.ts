@@ -1,1 +1,9 @@
-export class CreateCategoryInput {}
+import { InputType, Field } from '@nestjs/graphql';
+import { IsString } from 'class-validator';
+
+@InputType()
+export class CreateCategoryInput {
+  @Field()
+  @IsString()
+  name: string;
+}
