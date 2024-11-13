@@ -1,34 +1,26 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { PaymentService } from './payment.service';
-import { CreatePaymentInput } from './dto/create-payment.input';
-import { UpdatePaymentInput } from './dto/update-payment.input';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { PaymentService } from '@/payment/payment.service';
+import { PaymentDto } from '@/payment/dto/payment.dto';
+import { PaymentsDto } from '@/payment/dto/payments.dto';
+import { CreatePaymentInput } from '@/payment/dto/create-payment.input';
+import { UpdatePaymentInput } from '@/payment/dto/update-payment.input';
 
-@Resolver('Payment')
+@Resolver(() => PaymentDto)
 export class PaymentResolver {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Mutation('createPayment')
-  create(@Args('createPaymentInput') createPaymentInput: CreatePaymentInput) {
+  @Mutation(() => PaymentDto)
+  createPayment(@Args('createPaymentInput') createPaymentInput: CreatePaymentInput) {
     return this.paymentService.create(createPaymentInput);
   }
 
-  @Query('payment')
-  findAll() {
-    return this.paymentService.findAll();
+  @Mutation(() => PaymentDto)
+  updatePayment(@Args('updatePaymentInput') updatePaymentInput: UpdatePaymentInput) {
+    return this.paymentService.update(updatePaymentInput.paymentId, updatePaymentInput.status);
   }
 
-  @Query('payment')
-  findOne(@Args('id') id: number) {
-    return this.paymentService.findOne(id);
-  }
-
-  @Mutation('updatePayment')
-  update(@Args('updatePaymentInput') updatePaymentInput: UpdatePaymentInput) {
-    return this.paymentService.update(updatePaymentInput.id, updatePaymentInput);
-  }
-
-  @Mutation('removePayment')
-  remove(@Args('id') id: number) {
-    return this.paymentService.remove(id);
+  @Query(() => PaymentDto, { name: 'getMyPayment' })
+  getMyPayment(@Args('orderId', { type: () => ID }) orderId: string) {
+    return this.paymentService.getMyPayment(orderId);
   }
 }

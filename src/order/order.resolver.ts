@@ -1,34 +1,74 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { OrderService } from './order.service';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { OrderService } from '@/order/order.service';
+import { OrderDto } from '@/order/dto/order.dto';
+import { CreateOrderInput } from '@/order/dto/create-order.input';
+import { DeleteOrderItemInput } from '@/order/dto/delete-order-item.input';
+import { DeleteOrderInput } from '@/order/dto/delete-order.input';
+import { DeleteOrderItemsNowInput } from '@/order/dto/delete-order-items-now.input';
+import { UpdateOrderInput } from '@/order/dto/update-order.input';
+import { UpdateOrderItemsInput } from '@/order/dto/update-order-items.input';
 
-@Resolver('Order')
+@Resolver(() => OrderDto)
 export class OrderResolver {
   constructor(private readonly orderService: OrderService) {}
 
-  @Mutation('createOrder')
-  create(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
+  @Mutation(() => OrderDto)
+  createOrder(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
     return this.orderService.create(createOrderInput);
   }
 
-  @Query('order')
+  @Mutation(() => OrderDto)
+  deleteAnOrderItem(@Args('deleteOrderItemInput') deleteOrderItemInput: DeleteOrderItemInput) {
+    return this.orderService.deleteOrderItem(deleteOrderItemInput.orderId, deleteOrderItemInput.orderItemId);
+  }
+
+  @Mutation(() => OrderDto)
+  deleteOrder(@Args('deleteOrderInput') deleteOrderInput: DeleteOrderInput) {
+    return this.orderService.delete(deleteOrderInput.orderId);
+  }
+
+  @Mutation(() => OrderDto)
+  deleteOrderItemsNow(@Args('deleteOrderItemsNowInput') deleteOrderItemsNowInput: DeleteOrderItemsNowInput) {
+    return this.orderService.deleteOrderItemsNow(deleteOrderItemsNowInput.ids);
+  }
+
+  @Mutation(() => OrderDto)
+  updateOrder(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
+    return this.orderService.update(updateOrderInput.orderId, updateOrderInput.status);
+  }
+
+  @Mutation(() => OrderDto)
+  updateOrderItems(@Args('updateOrderItemsInput') updateOrderItemsInput: UpdateOrderItemsInput) {
+    return this.orderService.updateOrderItems(updateOrderItemsInput.orderId, updateOrderItemsInput.orderItems);
+  }
+
+  @Query(() => [OrderDto], { name: 'getAllOrders' })
   findAll() {
     return this.orderService.findAll();
   }
 
-  @Query('order')
-  findOne(@Args('id') id: number) {
-    return this.orderService.findOne(id);
+  @Query(() => OrderDto, { name: 'getAnOrderItem' })
+  findOne(@Args('orderItemId', { type: () => ID }) orderItemId: string) {
+    return this.orderService.findOne(orderItemId);
   }
 
-  @Mutation('updateOrder')
-  update(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
-    return this.orderService.update(updateOrderInput.id, updateOrderInput);
+  @Query(() => [OrderDto], { name: 'getMyOrderItems' })
+  findMyOrderItems(@Args('orderId', { type: () => ID }) orderId: string) {
+    return this.orderService.findMyOrderItems(orderId);
   }
 
-  @Mutation('removeOrder')
-  remove(@Args('id') id: number) {
-    return this.orderService.remove(id);
+  @Query(() => [OrderDto], { name: 'getMyOrders' })
+  findMyOrders() {
+    return this.orderService.findMyOrders();
+  }
+
+  @Query(() => [OrderDto], { name: 'getTheOrderAsDispatcher' })
+  findTheOrderAsDispatcher() {
+    return this.orderService.findTheOrderAsDispatcher();
+  }
+
+  @Query(() => [OrderDto], { name: 'getTheOrderAsSeller' })
+  findTheOrderAsSeller() {
+    return this.orderService.findTheOrderAsSeller();
   }
 }

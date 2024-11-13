@@ -1,34 +1,46 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { ProductService } from './product.service';
-import { CreateProductInput } from './dto/create-product.input';
-import { UpdateProductInput } from './dto/update-product.input';
+import { ProductDto } from './dto/product.dto';
+import { CreateProductInput } from '@/product/dto/create-product.input';
+import { UpdateProductInput } from '@/product/dto/update-product.input';
+import { DeleteProductInput } from '@/product/dto/delete-product.input';
 
-@Resolver('Product')
+@Resolver(() => ProductDto)
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
-  @Mutation('createProduct')
-  create(@Args('createProductInput') createProductInput: CreateProductInput) {
+  @Mutation(() => ProductDto)
+  createProduct(@Args('createProductInput') createProductInput: CreateProductInput) {
     return this.productService.create(createProductInput);
   }
 
-  @Query('product')
+  @Mutation(() => ProductDto)
+  updateProduct(@Args('updateProductInput') updateProductInput: UpdateProductInput) {
+    return this.productService.update(updateProductInput.id, updateProductInput);
+  }
+
+  @Mutation(() => ProductDto)
+  deleteProduct(@Args('deleteProductInput') deleteProductInput: DeleteProductInput) {
+    return this.productService.delete(deleteProductInput.id);
+  }
+
+  @Query(() => [ProductDto], { name: 'getAllProducts' })
   findAll() {
     return this.productService.findAll();
   }
 
-  @Query('product')
-  findOne(@Args('id') id: number) {
+  @Query(() => ProductDto, { name: 'getProduct' })
+  findOne(@Args('id', { type: () => ID }) id: string) {
     return this.productService.findOne(id);
   }
 
-  @Mutation('updateProduct')
-  update(@Args('updateProductInput') updateProductInput: UpdateProductInput) {
-    return this.productService.update(updateProductInput.id, updateProductInput);
+  @Query(() => [ProductDto], { name: 'getAllProductsOfUsersByCategory' })
+  findAllByCategory(@Args('categoryId', { type: () => ID }) categoryId: string) {
+    return this.productService.findAllByCategory(categoryId);
   }
 
-  @Mutation('removeProduct')
-  remove(@Args('id') id: number) {
-    return this.productService.remove(id);
+  @Query(() => [ProductDto], { name: 'getUserProducts' })
+  findUserProducts() {
+    return this.productService.findUserProducts();
   }
 }
