@@ -1,26 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, UpdateWriteOpResult } from 'mongoose';
+import { OrderDocument } from '@/order/schemas/order.schema';
+import { CreateOrderInput } from '@/order/dto/create-order.input';
+import { UpdateOrderInput } from '@/order/dto/update-order.input';
+import { UpdateOrderItemsInput } from '@/order/dto/update-order-items.input';
 
 @Injectable()
 export class OrderService {
-  create(createOrderInput: CreateOrderInput) {
-    return 'This action adds a new order';
+  constructor(@InjectModel('Order') private orderModel: Model<OrderDocument>) {}
+
+  create(createOrderInput: CreateOrderInput): Promise<OrderDocument> {
+    const createdOrder = new this.orderModel(createOrderInput);
+    return createdOrder.save();
   }
 
-  findAll() {
-    return `This action returns all order`;
+  deleteOrderItem(orderId: string, orderItemId: string): Promise<OrderDocument> {
+    return this.orderModel.findByIdAndUpdate(orderId, { $pull: { orderItems: orderItemId } }, { new: true }).exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  delete(orderId: string): Promise<OrderDocument> {
+    return this.orderModel.findByIdAndDelete(orderId).exec();
   }
 
-  update(id: number, updateOrderInput: UpdateOrderInput) {
-    return `This action updates a #${id} order`;
+  deleteOrderItemsNow(ids: string[]): Promise<UpdateWriteOpResult> {
+    return this.orderModel.updateMany({ _id: { $in: ids } }, { $pull: { orderItems: { $in: ids } } }).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  update(orderId: string, status: string): Promise<OrderDocument> {
+    return this.orderModel.findByIdAndUpdate(orderId, { status }, { new: true }).exec();
+  }
+
+  updateOrderItems(orderId: string, orderItems: UpdateOrderItemsInput[]): Promise<OrderDocument> {
+    return this.orderModel.findByIdAndUpdate(orderId, { orderItems }, { new: true }).exec();
+  }
+
+  findAll(): Promise<OrderDocument[]> {
+    return this.orderModel.find().exec();
+  }
+
+  findOne(orderItemId: string): Promise<OrderDocument> {
+    return this.orderModel.findOne({ 'orderItems._id': orderItemId }).exec();
+  }
+
+  findMyOrderItems(orderId: string): Promise<OrderDocument[]> {
+    return this.orderModel.find({ _id: orderId }).exec();
+  }
+
+  findMyOrders(): Promise<OrderDocument[]> {
+    return this.orderModel.find().exec();
+  }
+
+  findTheOrderAsDispatcher(): Promise<OrderDocument[]> {
+    // Implement logic to find orders as dispatcher
+    return this.orderModel.find().exec();
+  }
+
+  findTheOrderAsSeller(): Promise<OrderDocument[]> {
+    // Implement logic to find orders as seller
+    return this.orderModel.find().exec();
   }
 }

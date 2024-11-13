@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { LocationDocument } from './schemas/location.schema';
 import { CreateLocationInput } from './dto/create-location.input';
-import { UpdateLocationInput } from './dto/update-location.input';
+import { AddUserLocationInput } from './dto/add-user-location.input';
+import { UpdateUserLocationInput } from './dto/update-user-location.input';
 
 @Injectable()
 export class LocationService {
-  create(createLocationInput: CreateLocationInput) {
-    return 'This action adds a new location';
+  constructor(@InjectModel('Location') private locationModel: Model<LocationDocument>) {}
+
+  create(createLocationInput: CreateLocationInput): Promise<LocationDocument> {
+    const createdLocation = new this.locationModel(createLocationInput);
+    return createdLocation.save();
   }
 
-  findAll() {
-    return `This action returns all location`;
+  addUserLocation(addUserLocationInput: AddUserLocationInput): Promise<LocationDocument> {
+    const createdLocation = new this.locationModel(addUserLocationInput);
+    return createdLocation.save();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} location`;
+  updateUserLocation(updateUserLocationInput: UpdateUserLocationInput): Promise<LocationDocument> {
+    return this.locationModel.findByIdAndUpdate(updateUserLocationInput.locationId, updateUserLocationInput, { new: true }).exec();
   }
 
-  update(id: number, updateLocationInput: UpdateLocationInput) {
-    return `This action updates a #${id} location`;
+  deleteUserLocation(locationId: string): Promise<LocationDocument> {
+    return this.locationModel.findByIdAndDelete(locationId).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} location`;
+  getCountries(): Promise<LocationDocument[]> {
+    return this.locationModel.find().exec();
+  }
+
+  getLgas(state: string): Promise<LocationDocument[]> {
+    return this.locationModel.find({ state }).exec();
+  }
+
+  getStates(country: string): Promise<LocationDocument[]> {
+    return this.locationModel.find({ country }).exec();
+  }
+
+  getUserLocations(): Promise<LocationDocument[]> {
+    return this.locationModel.find().exec();
   }
 }
