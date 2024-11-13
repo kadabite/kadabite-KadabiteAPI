@@ -1,8 +1,5 @@
 import { Schema as MongooseSchema, SchemaFactory, Prop } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchemaType } from 'mongoose';
-import { IProduct, Product } from '@/models/product';
-import { IOrderItem, OrderItem } from '@/models/orderItem';
-import { IPayment } from '@/models/payment';
 
 export type OrderDocument = HydratedDocument<Order>;
 export type OrderItemDocument = HydratedDocument<OrderItem>;
@@ -58,33 +55,13 @@ export class Order {
   status: 'completed' | 'incomplete' | 'pending';
 
   @Prop({ type: [MongooseSchemaType.Types.ObjectId], ref: 'OrderItem' })
-  orderItems: MongooseSchemaType.Types.ObjectId[] | IOrderItem[];
+  orderItems: MongooseSchemaType.Types.ObjectId[];
 
   @Prop({ type: [MongooseSchemaType.Types.ObjectId], ref: 'Payment' })
-  payment: MongooseSchemaType.Types.ObjectId[] | IPayment[];
+  payment: MongooseSchemaType.Types.ObjectId[];
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-// Pre-save hook to calculate total amount
-OrderSchema.pre<OrderDocument>('save', async function (next) {
-  const items = this.orderItems;
-  let totalAmount = 0;
-
-  for (const item of items) {
-    const orderItem = await OrderItem.findById(item.toString());
-    if (orderItem?.productId) {
-      const product = await Product.findById(orderItem.productId.toString());
-      if (product?.price && orderItem?.quantity) {
-        totalAmount += product.price * orderItem.quantity;
-      }
-    }
-  }
-
-  this.totalAmount = totalAmount;
-  next();
-});
-
 export const OrderItemSchema = SchemaFactory.createForClass(OrderItem);
-export const OrderItem = mongoose.models.OrderItem || mongoose.model<OrderItemDocument>('OrderItem', OrderItemSchema);
 

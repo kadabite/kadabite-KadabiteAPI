@@ -1,7 +1,5 @@
 import { Schema as MongooseSchema, SchemaFactory, Prop } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchemaType } from 'mongoose';
-import bcrypt from 'bcrypt';
-// import { IProduct } from '@/models/product';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -87,13 +85,3 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-// Pre-save hook to hash the password
-UserSchema.pre<UserDocument>('save', async function (next) {
-    if (!this.isModified('passwordHash')) {
-      return next();
-    }
-    const salt = await bcrypt.genSalt();
-    this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
-    next();
-  });

@@ -11,4 +11,4 @@ export class Category {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
-export const Category = mongoose.models.Category || mongoose.model<CategoryDocument>('Category', CategorySchema);
+// export const Category = mongoose.models.Category || mongoose.model<CategoryDocument>('Category', CategorySchema);
