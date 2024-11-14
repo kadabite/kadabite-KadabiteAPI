@@ -13,31 +13,23 @@ import { LocationModule } from '@/location/location.module';
 import { CategoryModule } from '@/category/category.module';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bullmq';
-import { Keyv } from 'keyv';
 import KeyvRedis from '@keyv/redis';
-import { createCache } from 'cache-manager';
-import { CacheableMemory } from 'cacheable';
+import Keyv from 'keyv';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     CacheModule.registerAsync({
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const memoryStore = new Keyv({
-          store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
-        });
-
-        const redisStore = new Keyv({
-          store: new KeyvRedis(configService.get<string>('REDIS_URL')),
-        });
-
-        const cache = createCache({
-          stores: [memoryStore, redisStore],
-          ttl: configService.get<number>('CACHE_TTL'),
-          refreshThreshold: 3000,
-        });
+        const redisUrl = configService.get<string>('REDIS_URL');
+        const redisStore = new Keyv({ store: new KeyvRedis(redisUrl) });
 
         return {
-          store: cache as unknown as CacheStore,
+          store: redisStore as unknown as CacheStore, // Cast to CacheStore
+          ttl: configService.get<number>('CACHE_TTL'),
         };
       },
       inject: [ConfigService],
@@ -51,9 +43,6 @@ import { CacheableMemory } from 'cacheable';
         },
       }),
       inject: [ConfigService],
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -69,7 +58,7 @@ import { CacheableMemory } from 'cacheable';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get('MONGODB_URI'),
+        uri: configService.get<string>('MONGODB_URI'),
       }),
       inject: [ConfigService],
     }),
