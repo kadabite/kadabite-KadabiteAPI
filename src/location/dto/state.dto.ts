@@ -10,5 +10,5 @@ export class StateDto {
   name: string;
 
   @Field(() => CountryDto)
-  country: CountryDto;
+  country?: CountryDto;
 }

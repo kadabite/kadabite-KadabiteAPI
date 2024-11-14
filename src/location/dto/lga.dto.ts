@@ -10,5 +10,5 @@ export class LgaDto {
   name: string;
 
   @Field(() => StateDto)
-  state: StateDto;
+  state?: StateDto;
 }

@@ -7,6 +7,7 @@ import { LocationDto } from '@/location/dto/location.dto';
 import { OrderDto } from '@/order/dto/order.dto';
 import { OrderItemDto } from '@/order/dto/order-item.dto';
 import { PaymentDto } from '@/payment/dto/payment.dto';
+import { PaymentsDto } from '@/payment/dto/payments.dto';
 import { ProductDto } from '@/product/dto/product.dto';
 import { StateDto } from '@/location/dto/state.dto';
 import { UserDto } from '@/user/dto/user.dto';
@@ -60,7 +61,7 @@ export class MessageDto {
   paymentData?: PaymentDto;
 
   @Field(() => [PaymentDto], { nullable: true })
-  paymentsData?: PaymentDto[];
+  paymentsData?: PaymentsDto[];
 
   @Field(() => ProductDto, { nullable: true })
   productData?: ProductDto;
