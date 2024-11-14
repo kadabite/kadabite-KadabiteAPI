@@ -2,9 +2,9 @@ import { Schema as MongooseSchema, SchemaFactory, Prop } from '@nestjs/mongoose'
 import { HydratedDocument, Schema as MongooseSchemaType } from 'mongoose';
 
 // Define types for the functions
-type PaymentMethod = "transfer" | "cash" | "pos";
-type Currency = "Naira" | "Dollar";
-type PaymentStatus = "inprocess" | "unpaid" | "paid";
+export type PaymentMethod = "transfer" | "cash" | "pos";
+export type Currency = "Naira" | "Dollar";
+export type PaymentStatus = "inprocess" | "unpaid" | "paid";
 
 // Define constants with specific types
 export const paymentMethods: PaymentMethod[] = ["transfer", "cash", "pos"];
