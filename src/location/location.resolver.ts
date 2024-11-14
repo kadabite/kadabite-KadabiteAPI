@@ -8,6 +8,7 @@ import { DeleteUserLocationInput } from '@/location/dto/delete-user-location.inp
 import { CountryDto } from '@/location/dto/country.dto';
 import { LgaDto } from '@/location/dto/lga.dto';
 import { StateDto } from '@/location/dto/state.dto';
+import addressesData  from '@/common/util/locations';
 
 @Resolver(() => LocationDto)
 export class LocationResolver {
@@ -15,22 +16,26 @@ export class LocationResolver {
 
   @Mutation(() => LocationDto)
   createLocation(@Args('createLocationInput') createLocationInput: CreateLocationInput) {
-    return this.locationService.create(createLocationInput);
+
+    return this.locationService.create(createLocationInput, addressesData);
   }
 
   @Mutation(() => LocationDto)
   addUserLocation(@Args('addUserLocationInput') addUserLocationInput: AddUserLocationInput) {
-    return this.locationService.addUserLocation(addUserLocationInput);
+    const userId = '60b4d1b4b3f4f00015f2f3b4';
+    return this.locationService.addUserLocation(addUserLocationInput, userId);
   }
 
   @Mutation(() => LocationDto)
   updateUserLocation(@Args('updateUserLocationInput') updateUserLocationInput: UpdateUserLocationInput) {
-    return this.locationService.updateUserLocation(updateUserLocationInput);
+    const userId = '60b4d1b4b3f4f00015f2f3b4';
+    return this.locationService.updateUserLocation(updateUserLocationInput, userId);
   }
 
   @Mutation(() => LocationDto)
   deleteUserLocation(@Args('deleteUserLocationInput') deleteUserLocationInput: DeleteUserLocationInput) {
-    return this.locationService.deleteUserLocation(deleteUserLocationInput.locationId);
+    const userId = '60b4d1b4b3f4f00015f2f3b4';
+    return this.locationService.deleteUserLocation(deleteUserLocationInput.locationId, userId);
   }
 
   @Query(() => [CountryDto], { name: 'getCountries' })
@@ -50,6 +55,6 @@ export class LocationResolver {
 
   @Query(() => [LocationDto], { name: 'getUserLocations' })
   getUserLocations() {
-    return this.locationService.getUserLocations();
+    return this.locationService.getUserLocations('60b4d1b4b3f4f00015f2f3b4');
   }
 }

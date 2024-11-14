@@ -11,16 +11,26 @@ export class PaymentResolver {
 
   @Mutation(() => PaymentDto)
   createPayment(@Args('createPaymentInput') createPaymentInput: CreatePaymentInput) {
-    return this.paymentService.create(createPaymentInput);
+    const userId = 'userId'; // Get userId from context
+    return this.paymentService.createPayment(
+      createPaymentInput.orderId,
+      createPaymentInput.paymentMethod,
+      createPaymentInput.currency,
+      createPaymentInput.sellerAmount,
+      createPaymentInput.dispatcherAmount,
+      userId
+    );
   }
 
   @Mutation(() => PaymentDto)
   updatePayment(@Args('updatePaymentInput') updatePaymentInput: UpdatePaymentInput) {
-    return this.paymentService.update(updatePaymentInput.paymentId, updatePaymentInput.status);
+    const userId = 'userId'; // Get userId from context
+    return this.paymentService.updatePayment(updatePaymentInput.paymentId, updatePaymentInput.status, userId);
   }
 
   @Query(() => PaymentDto, { name: 'getMyPayment' })
   getMyPayment(@Args('orderId', { type: () => ID }) orderId: string) {
-    return this.paymentService.getMyPayment(orderId);
+    const userId = 'userId'; // Get userId from context
+    return this.paymentService.getMyPayment(orderId, userId);
   }
 }
