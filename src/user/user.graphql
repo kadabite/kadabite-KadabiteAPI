@@ -17,6 +17,7 @@ type Message {
   paymentsData: [Payment]
   productData: Product
   productsData: [Product]
+  pagination: Pagination
   refreshToken: String
   statesData: [State]
   statusCode: Int!
@@ -68,16 +69,22 @@ type Mutation {
   ): Message!
 }
 
+type Pagination {
+  totalItems: Int
+  totalPages: Int
+  currentPage: Int
+  itemsPerPage: Int
+}
+
 type Query {
   findFoods(productName: String!): Message!
-  findRestaurants(username: String): Message!
   thirdPartyUser(username: String!): ThirdPartyUser!
   user: Message!
-  users: Message!
+  users(page: Int, limit: Int): Message!
 }
 
 type Restaurant {
-  addressSeller: [Location]
+  addressSeller: Location
   businessDescription: String
   createdAt: String!
   currency: String

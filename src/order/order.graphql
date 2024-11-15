@@ -50,10 +50,10 @@ input OrderItems {
 }
 
 type Query {
-  getAllOrders: Message!
+  getAllOrders(page: Int, limit: Int): Message!
   getAnOrderItem(orderItemId: ID!): Message!
   getMyOrderItems(orderId: ID!): Message!
-  getMyOrders: Message!
+  getMyOrders(page: Int, limit: Int): Message!
   getTheOrderAsDispatcher: Message!
   getTheOrderAsSeller: Message!
 }

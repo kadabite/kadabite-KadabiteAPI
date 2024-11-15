@@ -7,10 +7,13 @@ type Mutation {
     categoryId: ID!): Message!
   deleteProduct(id: ID!): Message!
   updateProduct(
-    orderId: ID!,
-    deliveryAddress: String!,
-    recievedByBuyer: Boolean,
-    deliveredByDispatcher: Boolean): Message!
+    id: ID!
+    currency: String,
+    description: String
+    name: String
+    photo: String
+    price: Int
+  ): Message!
 }
 
 type Product {
@@ -26,8 +29,8 @@ type Product {
 }
 
 type Query {
-  getAllProducts: Message!
-  getAllProductsOfUsersByCategory(categoryId: ID!): Message!
+  getAllProducts(page: Int, limit: Int): Message!
+  getAllProductsOfUsersByCategory(categoryId: ID!, page: Int, limit: Int): Message!
   getProduct(id: ID!): Message!
   getUserProducts: Message!
 }
