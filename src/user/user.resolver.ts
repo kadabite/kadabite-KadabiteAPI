@@ -17,7 +17,8 @@ export class UserResolver {
 
   @Mutation(() => MessageDto)
   deleteUser() {
-    return this.userService.delete();
+    const userId = 'asfwawf';
+    return this.userService.delete(userId);
   }
 
   @Mutation(() => MessageDto)
@@ -32,12 +33,14 @@ export class UserResolver {
 
   @Mutation(() => MessageDto)
   logout() {
-    return this.userService.logout();
+    const userId = 'asqwer';
+    return this.userService.logout(userId);
   }
 
   @Mutation(() => MessageDto)
   registerUser(@Args('registerUserInput') registerUserInput: RegisterUserInput) {
-    return this.userService.register(registerUserInput);
+    const userId = 'fasfwearew';
+    return this.userService.register(registerUserInput, userId);
   }
 
   @Mutation(() => MessageDto)
@@ -53,22 +56,20 @@ export class UserResolver {
 
   @Query(() => MessageDto, { name: 'user' })
   findUser() {
-    return this.userService.findUser();
+    const userId = 'fasfwqree';
+    return this.userService.findOne(userId);
   }
 
   @Query(() => MessageDto, { name: 'users' })
   findUsers() {
-    return this.userService.findUsers();
+    return this.userService.findAll();
   }
 
   @Query(() => MessageDto, { name: 'findFoods' })
   findFoods(@Args('productName') productName: string) {
-    return this.userService.findFoods(productName);
-  }
-
-  @Query(() => MessageDto, { name: 'findRestaurants' })
-  findRestaurants(@Args('username') username: string) {
-    return this.userService.findRestaurants(username);
+    const page = 4;
+    const limit = 3;
+    return this.userService.findFoods(productName, page, limit);
   }
 
   @Query(() => ThirdPartyUserDto, { name: 'thirdPartyUser' })

@@ -11,22 +11,27 @@ export class ProductResolver {
 
   @Mutation(() => ProductDto)
   createProduct(@Args('createProductInput') createProductInput: CreateProductInput) {
-    return this.productService.create(createProductInput);
+    const userId = 'fafwdaf';
+    return this.productService.create(createProductInput, userId);
   }
 
   @Mutation(() => ProductDto)
   updateProduct(@Args('updateProductInput') updateProductInput: UpdateProductInput) {
-    return this.productService.update(updateProductInput.id, updateProductInput);
+    const userId = '3afsaf';
+    return this.productService.update(updateProductInput, userId);
   }
 
   @Mutation(() => ProductDto)
   deleteProduct(@Args('deleteProductInput') deleteProductInput: DeleteProductInput) {
-    return this.productService.delete(deleteProductInput.id);
+    const userId = 'farbfea';
+    return this.productService.delete(deleteProductInput.id, userId);
   }
 
   @Query(() => [ProductDto], { name: 'getAllProducts' })
   findAll() {
-    return this.productService.findAll();
+    const page = 2;
+    const limit = 10;
+    return this.productService.findAll(page, limit);
   }
 
   @Query(() => ProductDto, { name: 'getProduct' })
@@ -36,11 +41,15 @@ export class ProductResolver {
 
   @Query(() => [ProductDto], { name: 'getAllProductsOfUsersByCategory' })
   findAllByCategory(@Args('categoryId', { type: () => ID }) categoryId: string) {
-    return this.productService.findAllByCategory(categoryId);
+    const userId = 'ddsfg';
+    const page = 3;
+    const limit = 4;
+    return this.productService.findAllByCategory(userId, categoryId, page, limit);
   }
 
   @Query(() => [ProductDto], { name: 'getUserProducts' })
   findUserProducts() {
-    return this.productService.findUserProducts();
+    const userId = 'sdfafafw3242';
+    return this.productService.findUserProducts(userId);
   }
 }

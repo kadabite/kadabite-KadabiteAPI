@@ -14,37 +14,39 @@ export class OrderResolver {
 
   @Mutation(() => OrderDto)
   createOrder(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
-    return this.orderService.create(createOrderInput);
+    const userId = 'ffafwe';
+    return this.orderService.create(createOrderInput, userId);
   }
 
   @Mutation(() => OrderDto)
   deleteAnOrderItem(@Args('deleteOrderItemInput') deleteOrderItemInput: DeleteOrderItemInput) {
-    return this.orderService.deleteOrderItem(deleteOrderItemInput.orderId, deleteOrderItemInput.orderItemId);
+    const userId = 'affr'
+    return this.orderService.deleteOrderItem(deleteOrderItemInput.orderId, deleteOrderItemInput.orderItemId, userId);
   }
 
   @Mutation(() => OrderDto)
   deleteOrder(@Args('deleteOrderInput') deleteOrderInput: DeleteOrderInput) {
-    return this.orderService.delete(deleteOrderInput.orderId);
-  }
-
-  @Mutation(() => OrderDto)
-  deleteOrderItemsNow(@Args('deleteOrderItemsNowInput') deleteOrderItemsNowInput: DeleteOrderItemsNowInput) {
-    return this.orderService.deleteOrderItemsNow(deleteOrderItemsNowInput.ids);
+    const userId = 'fasfawer';
+    return this.orderService.delete(deleteOrderInput.orderId, userId);
   }
 
   @Mutation(() => OrderDto)
   updateOrder(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
-    return this.orderService.update(updateOrderInput.orderId, updateOrderInput.status);
+    const userId = 'asfw';
+    return this.orderService.update(updateOrderInput, userId);
   }
 
   @Mutation(() => OrderDto)
   updateOrderItems(@Args('updateOrderItemsInput') updateOrderItemsInput: UpdateOrderItemsInput) {
-    return this.orderService.updateOrderItems(updateOrderItemsInput.orderId, updateOrderItemsInput.orderItems);
+    const userId = 'fasff';
+    return this.orderService.updateOrderItems(updateOrderItemsInput.orderId, updateOrderItemsInput.orderItems, userId);
   }
 
   @Query(() => [OrderDto], { name: 'getAllOrders' })
   findAll() {
-    return this.orderService.findAll();
+    const page = 4;
+    const limit = 10
+    return this.orderService.findAll(page, limit);
   }
 
   @Query(() => OrderDto, { name: 'getAnOrderItem' })
@@ -54,21 +56,32 @@ export class OrderResolver {
 
   @Query(() => [OrderDto], { name: 'getMyOrderItems' })
   findMyOrderItems(@Args('orderId', { type: () => ID }) orderId: string) {
-    return this.orderService.findMyOrderItems(orderId);
+    const userId = 'fasrge';
+    return this.orderService.findMyOrderItems(userId, orderId);
   }
 
   @Query(() => [OrderDto], { name: 'getMyOrders' })
   findMyOrders() {
-    return this.orderService.findMyOrders();
+    const userId = 'fasfda';
+    const page = 4;
+    const limit = 3;
+    return this.orderService.findMyOrders(userId, page, limit);
   }
 
   @Query(() => [OrderDto], { name: 'getTheOrderAsDispatcher' })
   findTheOrderAsDispatcher() {
-    return this.orderService.findTheOrderAsDispatcher();
+    const userId = 'fasfas';
+    const limit = 5;
+    const page = 5;
+    return this.orderService.findTheOrderAsDispatcher(userId, page, limit);
   }
 
   @Query(() => [OrderDto], { name: 'getTheOrderAsSeller' })
   findTheOrderAsSeller() {
-    return this.orderService.findTheOrderAsSeller();
+    const userId = 'fasfas';
+    const limit = 5;
+    const page = 5;
+
+    return this.orderService.findTheOrderAsSeller(userId, page, limit);
   }
 }
