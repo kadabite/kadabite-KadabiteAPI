@@ -1,5 +1,5 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
-import { IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 
 @InputType()
 export class UpdateOrderInput {
@@ -9,5 +9,13 @@ export class UpdateOrderInput {
 
   @Field()
   @IsString()
-  status: string;
+  deliveryAddress?: string;
+
+  @Field()
+  @IsBoolean()
+  recievedByBuyer?: boolean;
+
+  @Field()
+  @IsBoolean()
+  deliveredByDispatcher?: boolean;
 }
