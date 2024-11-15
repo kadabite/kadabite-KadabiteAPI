@@ -6,8 +6,8 @@ export class RestaurantDto {
   @Field(() => ID)
   id: string;
 
-  @Field(() => [LocationDto], { nullable: true })
-  addressSeller?: LocationDto[];
+  @Field(() => LocationDto, { nullable: true })
+  addressSeller?: LocationDto;
 
   @Field({ nullable: true })
   businessDescription?: string;

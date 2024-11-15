@@ -57,6 +57,14 @@ export class MessageDto {
   @Field(() => [OrderDto], { nullable: true })
   ordersData?: OrderDto[];
 
+  @Field({ nullable: true })
+  pagination?: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    itemsPerPage: number;
+  };
+
   @Field(() => PaymentDto, { nullable: true })
   paymentData?: PaymentDto;
 
