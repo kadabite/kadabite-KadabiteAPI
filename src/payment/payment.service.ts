@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { PaymentDocument, PaymentMethod } from '@/payment/schemas/payment.schema';
 import { OrderDocument } from '@/order/schemas/order.schema';
 import { MessageDto } from '@/user/dto/message.dto';
-import { UserNotFoundError } from '@/common/custom-errors/user/user-not-found.error';
 import { UnauthorizedError } from '@/common/custom-errors/auth/unauthorized.error';
 import { OrderNotFoundError } from '@/common/custom-errors/order/order-not-found.error';
 import { PaymentNotFoundError } from '@/common/custom-errors/payment/payment-not-found.error';
