@@ -4,6 +4,7 @@ import { UserResolver } from '@/user/user.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema, UserDocument } from '@/user/schemas/user.schema';
 import bcrypt from 'bcrypt';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   providers: [UserResolver, UserService],
@@ -25,7 +26,8 @@ import bcrypt from 'bcrypt';
           }
         }
       ]),
+    AuthModule
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, UserService],
 })
 export class UserModule {}

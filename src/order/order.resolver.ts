@@ -1,4 +1,5 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Context } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { OrderService } from '@/order/order.service';
 import { OrderDto } from '@/order/dto/order.dto';
 import { CreateOrderInput } from '@/order/dto/create-order.input';
@@ -7,45 +8,73 @@ import { DeleteOrderInput } from '@/order/dto/delete-order.input';
 import { DeleteOrderItemsNowInput } from '@/order/dto/delete-order-items-now.input';
 import { UpdateOrderInput } from '@/order/dto/update-order.input';
 import { UpdateOrderItemsInput } from '@/order/dto/update-order-items.input';
+import { AuthGuard } from '@/auth/auth.guard';
+import { OrderItemsInput } from '@/order/dto/order-items.input';
+import { OrderItem2Input } from '@/order/dto/order-item2.input';
+import { MessageDto } from '@/user/dto/message.dto';
 
 @Resolver(() => OrderDto)
 export class OrderResolver {
   constructor(private readonly orderService: OrderService) {}
 
   @Mutation(() => OrderDto)
-  createOrder(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
-    const userId = 'ffafwe';
-    return this.orderService.create(createOrderInput, userId);
+  @UseGuards(AuthGuard)
+  createOrder(
+    @Args('sellerId') sellerId: string,
+    @Args('dispatcherId', { nullable: true }) dispatcherId: string,
+    @Args('deliveryAddress') deliveryAddress: string,
+    @Args('orderItems') orderItems: OrderItemsInput[],
+    @Context() context
+  ) {
+    const userId = context.req.user.sub;
+    return this.orderService.create({ sellerId, dispatcherId, deliveryAddress, orderItems }, userId);
   }
 
   @Mutation(() => OrderDto)
-  deleteAnOrderItem(@Args('deleteOrderItemInput') deleteOrderItemInput: DeleteOrderItemInput) {
-    const userId = 'affr'
-    return this.orderService.deleteOrderItem(deleteOrderItemInput.orderId, deleteOrderItemInput.orderItemId, userId);
+  @UseGuards(AuthGuard)
+  deleteAnOrderItem(
+    @Args('orderId', { type: () => ID }) orderId: string, 
+    @Args('orderItemId', { type: () => ID }) orderItemId: string,
+    @Context() context) {
+    const userId = context.req.user.sub;
+    return this.orderService.deleteOrderItem(orderId, orderItemId, userId);
   }
 
   @Mutation(() => OrderDto)
-  deleteOrder(@Args('deleteOrderInput') deleteOrderInput: DeleteOrderInput) {
-    const userId = 'fasfawer';
-    return this.orderService.delete(deleteOrderInput.orderId, userId);
+  @UseGuards(AuthGuard)
+  deleteOrder(
+    @Args('orderId') orderId: string,
+    @Context() context) {
+    const userId = context.req.user.sub;
+    return this.orderService.delete(orderId, userId);
   }
 
   @Mutation(() => OrderDto)
-  updateOrder(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
-    const userId = 'asfw';
-    return this.orderService.update(updateOrderInput, userId);
+  @UseGuards(AuthGuard)
+  async updateOrder(
+    @Args('orderId') orderId: string,
+    @Context() context,
+    @Args('deliveryAddress', { nullable: true }) deliveryAddress?: string,
+    @Args('receivedByBuyer', { nullable: true }) recievedByBuyer?: boolean,
+    @Args('deliveredByDispatcher', { nullable: true }) deliveredByDispatcher?: boolean,
+  ): Promise<MessageDto> {
+    const userId = context.req.user.sub;
+    return this.orderService.update({ orderId, deliveryAddress, recievedByBuyer, deliveredByDispatcher }, userId);
   }
 
   @Mutation(() => OrderDto)
-  updateOrderItems(@Args('updateOrderItemsInput') updateOrderItemsInput: UpdateOrderItemsInput) {
-    const userId = 'fasff';
-    return this.orderService.updateOrderItems(updateOrderItemsInput.orderId, updateOrderItemsInput.orderItems, userId);
+  @UseGuards(AuthGuard)
+  updateOrderItems(
+    @Args('orderId') orderId: string,
+    @Args('orderItems') orderItems: OrderItem2Input[],
+    @Context() context
+  ) {
+    const userId = context.req.user.sub;
+    return this.orderService.updateOrderItems(orderId, orderItems, userId);
   }
 
   @Query(() => [OrderDto], { name: 'getAllOrders' })
-  findAll() {
-    const page = 4;
-    const limit = 10
+  findAll(@Args('page', { type: () => Number, nullable: true }) page: number = 1, @Args('limit', { type: () => Number, nullable: true }) limit: number = 10) {
     return this.orderService.findAll(page, limit);
   }
 
@@ -55,33 +84,30 @@ export class OrderResolver {
   }
 
   @Query(() => [OrderDto], { name: 'getMyOrderItems' })
-  findMyOrderItems(@Args('orderId', { type: () => ID }) orderId: string) {
-    const userId = 'fasrge';
+  @UseGuards(AuthGuard)
+  findMyOrderItems(@Args('orderId', { type: () => ID }) orderId: string, @Context() context) {
+    const userId = context.req.user.sub;
     return this.orderService.findMyOrderItems(userId, orderId);
   }
 
   @Query(() => [OrderDto], { name: 'getMyOrders' })
-  findMyOrders() {
-    const userId = 'fasfda';
-    const page = 4;
-    const limit = 3;
+  @UseGuards(AuthGuard)
+  findMyOrders(@Context() context, @Args('page', { type: () => Number, nullable: true }) page: number = 1, @Args('limit', { type: () => Number, nullable: true }) limit: number = 10) {
+    const userId = context.req.user.sub;
     return this.orderService.findMyOrders(userId, page, limit);
   }
 
   @Query(() => [OrderDto], { name: 'getTheOrderAsDispatcher' })
-  findTheOrderAsDispatcher() {
-    const userId = 'fasfas';
-    const limit = 5;
-    const page = 5;
+  @UseGuards(AuthGuard)
+  findTheOrderAsDispatcher(@Context() context, @Args('page', { type: () => Number, nullable: true }) page: number = 1, @Args('limit', { type: () => Number, nullable: true }) limit: number = 10) {
+    const userId = context.req.user.sub;
     return this.orderService.findTheOrderAsDispatcher(userId, page, limit);
   }
 
   @Query(() => [OrderDto], { name: 'getTheOrderAsSeller' })
-  findTheOrderAsSeller() {
-    const userId = 'fasfas';
-    const limit = 5;
-    const page = 5;
-
+  @UseGuards(AuthGuard)
+  findTheOrderAsSeller(@Context() context, @Args('page', { type: () => Number, nullable: true }) page: number = 1, @Args('limit', { type: () => Number, nullable: true }) limit: number = 10) {
+    const userId = context.req.user.sub;
     return this.orderService.findTheOrderAsSeller(userId, page, limit);
   }
 }

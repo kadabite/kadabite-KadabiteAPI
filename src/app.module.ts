@@ -13,6 +13,7 @@ import { LocationModule } from '@/location/location.module';
 import { CategoryModule } from '@/category/category.module';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bullmq';
+import { AuthModule } from './auth/auth.module';
 import KeyvRedis from '@keyv/redis';
 import Keyv from 'keyv';
 
@@ -68,6 +69,7 @@ import Keyv from 'keyv';
     OrderModule,
     LocationModule,
     CategoryModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

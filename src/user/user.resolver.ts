@@ -1,24 +1,33 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
-import { UserService } from './user.service';
-import { MessageDto } from './dto/message.dto';
-import { CreateUserInput } from './dto/create-user.input';
-import { RegisterUserInput } from './dto/register-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
-import { ThirdPartyUserDto } from './dto/third-party-user.dto';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { UserService } from '@/user/user.service';
+import { MessageDto } from '@/user/dto/message.dto';
+import { CreateUserInput } from '@/user/dto/create-user.input';
+import { RegisterUserInput } from '@/user/dto/register-user.input';
+import { UpdateUserInput } from '@/user/dto/update-user.input';
+import { AuthService } from '@/auth/auth.service';
+import { AuthGuard } from '@/auth/auth.guard';
 
 @Resolver(() => MessageDto)
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+  ) {}
 
   @Mutation(() => MessageDto)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.userService.create(createUserInput);
+  createUser(
+    @Args('email') email: string,
+    @Args('password') password: string,
+    @Args('phoneNumber', { nullable: true }) phoneNumber: string
+  ) {
+    return this.userService.create({ email, password, phoneNumber });
   }
 
   @Mutation(() => MessageDto)
-  deleteUser() {
-    const userId = 'asfwawf';
-    return this.userService.delete(userId);
+  @UseGuards(AuthGuard)
+  deleteUser(@Context() context) {
+    const userId = context.req.user.sub;
+    return this.userService.remove(userId);
   }
 
   @Mutation(() => MessageDto)
@@ -27,36 +36,45 @@ export class UserResolver {
   }
 
   @Mutation(() => MessageDto)
-  login(@Args('email') email: string, @Args('password') password: string) {
-    return this.userService.login(email, password);
-  }
-
-  @Mutation(() => MessageDto)
-  logout() {
-    const userId = 'asqwer';
+  @UseGuards(AuthGuard)
+  logout(@Context() context) {
+    const userId = context.req.user.sub;
     return this.userService.logout(userId);
   }
 
   @Mutation(() => MessageDto)
-  registerUser(@Args('registerUserInput') registerUserInput: RegisterUserInput) {
-    const userId = 'fasfwearew';
+  @UseGuards(AuthGuard)
+  registerUser(
+    @Args('registerUserInput') registerUserInput: RegisterUserInput,
+    @Context() context
+  ) {
+    const userId = context.req.user.sub;
     return this.userService.register(registerUserInput, userId);
   }
 
   @Mutation(() => MessageDto)
-  updatePassword(@Args('email') email: string, @Args('token') token: string, @Args('password') password: string) {
+  updatePassword(
+    @Args('email') email: string,
+    @Args('token') token: string,
+    @Args('password') password: string
+  ) {
     return this.userService.updatePassword(email, token, password);
   }
 
   @Mutation(() => MessageDto)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    const id = "60f3b3b3b3b3b3b3b3b3b3b3";
-    return this.userService.update(id, updateUserInput);
+  @UseGuards(AuthGuard)
+  updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+    @Context() context
+  ) {
+    const userId = context.req.user.sub;
+    return this.userService.update(userId, updateUserInput);
   }
 
   @Query(() => MessageDto, { name: 'user' })
-  findUser() {
-    const userId = 'fasfwqree';
+  @UseGuards(AuthGuard)
+  findUser(@Context() context) {
+    const userId = context.req.user.sub;
     return this.userService.findOne(userId);
   }
 
@@ -70,10 +88,5 @@ export class UserResolver {
     const page = 4;
     const limit = 3;
     return this.userService.findFoods(productName, page, limit);
-  }
-
-  @Query(() => ThirdPartyUserDto, { name: 'thirdPartyUser' })
-  findThirdPartyUser(@Args('username') username: string) {
-    return this.userService.findThirdPartyUser(username);
   }
 }
