@@ -19,6 +19,10 @@ export class CreateProductInput {
   @IsString()
   currency: string;
 
+  @Field()
+  @IsString()
+  photo?: string;
+
   @Field(() => ID)
   @IsUUID()
   categoryId: string;
