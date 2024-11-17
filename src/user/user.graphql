@@ -34,7 +34,6 @@ type Mutation {
   ): Message!
   deleteUser: Message!
   forgotPassword(email: String!): Message!
-  login(email: String!, password: String!): Message!
   logout: Message!
   registerUser(
     firstName: String!

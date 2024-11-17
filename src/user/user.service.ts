@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import mongoose, { Connection, Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { UserDocument } from '@/user/schemas/user.schema';
 import { CreateUserInput } from '@/user/dto/create-user.input';
 import { CountryDocument, StateDocument, LgaDocument, LocationDocument } from '@/location/schemas/location.schema';
@@ -8,7 +8,6 @@ import { UpdateUserInput } from '@/user/dto/update-user.input';
 import { RegisterUserInput } from '@/user/dto/register-user.input';
 import { MessageDto } from '@/user/dto/message.dto';
 import { UserDto } from '@/user/dto/user.dto';
-import { ThirdPartyUserDto } from '@/user/dto/third-party-user.dto';
 import { UserNotFoundError } from '@/common/custom-errors/user/user-not-found.error';
 import { InvalidCredentialsError, InvalidInputError } from '@/common/custom-errors/user/invalid-credentials.error';
 import { UserAlreadyExistsError } from '@/common/custom-errors/user/user-already-exists.error';
@@ -17,9 +16,6 @@ import { StateNotFoundError } from '@/common/custom-errors/location/state-not-fo
 import { LgaNotFoundError } from '@/common/custom-errors/location/lga-not-found.error';
 import { InvalidTokenError, TokenExpiredError } from '@/common/custom-errors/auth/unauthorized.error';
 import * as bcrypt from 'bcrypt';
-
-
-
 import _ from 'lodash';
 import { ProductDocument } from '@/product/schemas/product.schema';
 
@@ -138,6 +134,31 @@ export class UserService {
     }
   }
 
+  async findOneByEmail(email: string): Promise<MessageDto> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const userData = await this.userModel.findOne({ email }).session(session);
+      if (!userData) {
+        throw new UserNotFoundError('User not found');
+      }
+
+      await session.commitTransaction();
+      return { userData: this.toUserDto(userData), statusCode: 200, ok: true };
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Error fetching user by email: ' + (error as Error).message);
+
+      if (error instanceof UserNotFoundError) {
+        return { message: error.message, statusCode: 404, ok: false };
+      }
+
+      return { message: 'An error occurred!', statusCode: 500, ok: false };
+    } finally {
+      session.endSession();
+    }
+  }
+
   async update(userId: string, updateUserInput: UpdateUserInput): Promise<MessageDto> {
     const session = await this.connection.startSession();
     session.startTransaction();
@@ -190,12 +211,7 @@ export class UserService {
     }
   }
 
-  async remove(id: string): Promise<UserDto> {
-    const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
-    return this.toUserDto(deletedUser);
-  }
-
-  async delete(userId: string): Promise<MessageDto> {
+  async remove(userId: string): Promise<MessageDto> {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
@@ -223,11 +239,6 @@ export class UserService {
   async forgotPassword(email: string): Promise<MessageDto> {
     // Implement logic for forgot password
     return { message: 'Password reset email sent', ok: true, statusCode: 200 };
-  }
-
-  async login(email: string, password: string): Promise<MessageDto> {
-    // Implement logic for user login
-    return { message: 'Login successful', ok: true, statusCode: 200 };
   }
 
   async logout(userId: string): Promise<MessageDto> {
@@ -397,16 +408,6 @@ export class UserService {
     }
   }
 
-  async findUser(): Promise<MessageDto> {
-    const user = await this.userModel.findOne().exec();
-    return { userData: this.toUserDto(user), ok: true, statusCode: 200 };
-  }
-
-  async findUsers(): Promise<MessageDto> {
-    const users = await this.userModel.find().exec();
-    return { usersData: users.map(user => this.toUserDto(user)), ok: true, statusCode: 200 };
-  }
-
   async findFoods(productName: string, page: number, limit: number): Promise<MessageDto> {
     const session = await this.connection.startSession();
     session.startTransaction();
@@ -468,11 +469,6 @@ export class UserService {
     } finally {
       session.endSession();
     }
-  }
-
-  async findThirdPartyUser(username: string): Promise<ThirdPartyUserDto> {
-    // Implement logic to find third-party user by username
-    return { username, email: 'example@example.com', passwordHash: 'hashed_password' };
   }
 
   private toUserDto(user: UserDocument): UserDto {

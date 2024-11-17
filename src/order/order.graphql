@@ -8,7 +8,7 @@ type Mutation {
   deleteAnOrderItem(orderId: ID!, orderItemId: ID!): Message!
   deleteOrder(orderId: ID!): Message!
   deleteOrderItemsNow(ids: [ID]!): Message!
-  updateOrder(orderId: ID!, status: String!): Message!
+  updateOrder(orderId: ID!, deliveryAddress: String, receivedByBuyer: Boolean, deliveredByDispatcher: Boolean): Message!
   updateOrderItems(orderId: ID!, orderItems: [OrderItem2]!): Message!
 }
 
@@ -54,6 +54,6 @@ type Query {
   getAnOrderItem(orderItemId: ID!): Message!
   getMyOrderItems(orderId: ID!): Message!
   getMyOrders(page: Int, limit: Int): Message!
-  getTheOrderAsDispatcher: Message!
-  getTheOrderAsSeller: Message!
+  getTheOrderAsDispatcher(page: Int, limit: Int): Message!
+  getTheOrderAsSeller(page: Int, limit: Int): Message!
 }
