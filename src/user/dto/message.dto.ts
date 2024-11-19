@@ -12,6 +12,7 @@ import { ProductDto } from '@/product/dto/product.dto';
 import { StateDto } from '@/location/dto/state.dto';
 import { UserDto } from '@/user/dto/user.dto';
 import { UsersDto } from '@/user/dto/users.dto';
+import { IsUUID, IsString } from 'class-validator';
 
 @ObjectType()
 export class MessageDto {
@@ -31,6 +32,7 @@ export class MessageDto {
   foodsData?: RestaurantDto[];
 
   @Field(() => ID, { nullable: true })
+  @IsUUID()
   id?: string;
 
   @Field(() => [LgaDto], { nullable: true })
@@ -40,6 +42,7 @@ export class MessageDto {
   locationsData?: LocationDto[];
 
   @Field({ nullable: true })
+  @IsString()
   message?: string;
 
   @Field()
@@ -78,6 +81,7 @@ export class MessageDto {
   productsData?: ProductDto[];
 
   @Field({ nullable: true })
+  @IsString()
   refreshToken?: string;
 
   @Field(() => [StateDto], { nullable: true })
@@ -87,6 +91,7 @@ export class MessageDto {
   statusCode: number;
 
   @Field({ nullable: true })
+  @IsString()
   token?: string;
 
   @Field(() => UserDto, { nullable: true })

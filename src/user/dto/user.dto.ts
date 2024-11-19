@@ -1,39 +1,45 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { IsString, IsUUID } from 'class-validator';
+import { IsString, IsUUID, IsEmail } from 'class-validator';
 
 @ObjectType()
 export class UserDto {
   @Field(() => ID)
+  @IsUUID()
   id: string;
 
   @Field({ nullable: true })
-  @IsUUID()
+  @IsString()
   addressBuyer?: string;
 
   @Field({ nullable: true })
-  @IsUUID()
+  @IsString()
   addressDispatcher?: string;
 
   @Field({ nullable: true })
-  @IsUUID()
+  @IsString()
   addressSeller?: string;
 
   @Field({ nullable: true })
+  @IsString()
   buyerStatus?: string;
 
   @Field({ nullable: true })
+  @IsString()
   businessDescription?: string;
 
   @Field()
   createdAt: Date;
 
   @Field({ nullable: true })
+  @IsString()
   dispatcherStatus?: string;
 
   @Field({ nullable: true })
+  @IsEmail()
   email?: string;
 
   @Field({ nullable: true })
+  @IsString()
   firstName?: string;
 
   @Field()
@@ -43,33 +49,42 @@ export class UserDto {
   isLoggedIn: boolean;
 
   @Field({ nullable: true })
+  @IsString()
   lastName?: string;
 
   @Field(() => [String])
+  @IsString({ each: true })
   locations: string[];
 
   @Field({ nullable: true })
+  @IsString()
   phoneNumber?: string;
 
   @Field({ nullable: true })
+  @IsString()
   photo?: string;
 
   @Field(() => [String])
+  @IsString({ each: true })
   products: string[];
 
   @Field({ nullable: true })
+  @IsString()
   sellerStatus?: string;
 
   @Field()
   updatedAt: Date;
 
   @Field({ nullable: true })
+  @IsString()
   userType?: string;
 
   @Field({ nullable: true })
+  @IsString()
   username?: string;
 
   @Field()
+  @IsString()
   role: string;
 
   @Field()
