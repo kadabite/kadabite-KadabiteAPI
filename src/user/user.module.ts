@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UserService } from '@/user/user.service';
 import { UserResolver } from '@/user/user.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema, UserDocument } from '@/user/schemas/user.schema';
 import bcrypt from 'bcrypt';
 import { AuthModule } from '@/auth/auth.module';
+import { LocationModule } from '@/location/location.module';
+import { ProductModule } from '@/product/product.module';
 
 @Module({
   providers: [UserResolver, UserService],
@@ -26,8 +28,10 @@ import { AuthModule } from '@/auth/auth.module';
           }
         }
       ]),
-    AuthModule
+    forwardRef(() => AuthModule),
+    forwardRef(() => LocationModule),
+    forwardRef(() => ProductModule),
   ],
-  exports: [MongooseModule, UserService],
+  exports: [MongooseModule, UserService, UserResolver, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
 })
 export class UserModule {}

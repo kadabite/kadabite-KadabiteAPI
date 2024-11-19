@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { LocationService } from '@/location/location.service';
 import { LocationResolver } from '@/location/location.resolver';
 import { Lga, LgaSchema, State, StateSchema, Country, CountrySchema, Location, LocationSchema, StateDocument, CountryDocument } from '@/location/schemas/location.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CallbackError, Model, ObjectId, Schema } from 'mongoose';
+import { UserModule } from '@/user/user.module';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
   providers: [LocationResolver, LocationService],
@@ -63,7 +65,19 @@ import { CallbackError, Model, ObjectId, Schema } from 'mongoose';
         useFactory: () =>  LocationSchema
       },
     ]),
+    forwardRef(() => UserModule),
+    AuthModule
   ],
-  exports: [MongooseModule]
+  exports: [
+    MongooseModule,
+    LocationService,
+    LocationResolver,
+    MongooseModule.forFeature(
+      [
+        { name: Lga.name, schema: LgaSchema },
+        { name: State.name, schema: StateSchema },
+        { name: Country.name, schema: CountrySchema },
+        { name: Location.name, schema: LocationSchema },
+      ])],
 })
 export class LocationModule {}

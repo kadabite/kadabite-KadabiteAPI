@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { OrderService } from '@/order/order.service';
 import { OrderResolver } from '@/order/order.resolver';
 import { Order, OrderSchema, OrderItem, OrderItemSchema, OrderDocument } from '@/order/schemas/order.schema';
@@ -7,6 +7,8 @@ import { ProductModule } from '@/product/product.module';
 import { Model } from 'mongoose';
 import { IOrderItem } from '@/order/interfaces/order-item.interface';
 import { IProduct } from '@/product/interfaces/product.interface';
+import { AuthModule } from '@/auth/auth.module';
+import { UserModule } from '@/user/user.module';
 
 @Module({
   providers: [OrderResolver, OrderService],
@@ -46,8 +48,15 @@ import { IProduct } from '@/product/interfaces/product.interface';
         useFactory: () => OrderItemSchema
       },  
     ]),
-    ProductModule
+    ProductModule,
+    AuthModule,
+    forwardRef(() => UserModule),
   ],
-  exports: [MongooseModule]
+  exports: [
+    MongooseModule,
+    OrderService,
+    OrderResolver,
+    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+  ],
 })
 export class OrderModule {}
