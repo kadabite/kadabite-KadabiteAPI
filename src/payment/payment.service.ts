@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { Model } from 'mongoose';
@@ -9,7 +9,7 @@ import { UnauthorizedError } from '@/common/custom-errors/auth/unauthorized.erro
 import { OrderNotFoundError } from '@/common/custom-errors/order/order-not-found.error';
 import { PaymentNotFoundError } from '@/common/custom-errors/payment/payment-not-found.error';
 import { InvalidPaymentMethodError, InvalidCurrencyError, InvalidAmountError } from '@/common/custom-errors/payment/payment-errors.error';
-import { paymentMethods, currency } from '@/payment/schemas/payment.schema';
+import { paymentMethods } from '@/payment/schemas/payment.schema';
 import { UpdatePaymentInput } from '@/payment/dto/update-payment.input';
 import { CreatePaymentInput } from '@/payment/dto/create-payment.input';
 

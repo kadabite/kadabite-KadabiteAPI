@@ -18,8 +18,8 @@ import { InvalidTokenError, TokenExpiredError } from '@/common/custom-errors/aut
 import * as bcrypt from 'bcrypt';
 import _ from 'lodash';
 import { ProductDocument } from '@/product/schemas/product.schema';
-import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {

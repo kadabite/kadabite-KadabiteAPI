@@ -1,7 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, Connection } from 'mongoose';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { OrderDocument, OrderItemDocument } from '@/order/schemas/order.schema';
 import { MessageDto } from '@/user/dto/message.dto';
 import { UnauthorizedError } from '@/common/custom-errors/auth/unauthorized.error';
@@ -18,7 +18,6 @@ import { UserDocument } from '@/user/schemas/user.schema';
 import { CreateOrderInput } from '@/order/dto/create-order.input';
 import _ from 'lodash';
 import { Cache } from 'cache-manager';
-
 
 @Injectable()
 export class OrderService {

@@ -15,7 +15,6 @@ import _ from 'lodash';
 import { CategoryDocument } from '@/category/schemas/category.schema';
 import { Cache } from 'cache-manager';
 
-
 @Injectable()
 export class ProductService {
   private readonly logger = new Logger(ProductService.name);

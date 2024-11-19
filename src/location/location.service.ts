@@ -13,12 +13,11 @@ import { CountryNotFoundError } from '@/common/custom-errors/location/country-no
 import { UserNotFoundError } from '@/common/custom-errors/user/user-not-found.error';
 import { StateNotFoundError } from '@/common/custom-errors/location/state-not-found.error';
 import { LgaNotFoundError } from '@/common/custom-errors/location/lga-not-found.error';
-import {  LocationNotFoundError } from '@/common/custom-errors/location/location-not-found.error';
+import { LocationNotFoundError } from '@/common/custom-errors/location/location-not-found.error';
 import { DeletionError } from '@/common/custom-errors/location/deletion.error';
 import { Connection } from 'mongoose';
 import { Addresses }  from '@/common/util/locations';
 import { Cache } from 'cache-manager';
-
 
 @Injectable()
 export class LocationService {
