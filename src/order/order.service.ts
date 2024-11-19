@@ -1,7 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, Connection } from 'mongoose';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { OrderDocument, OrderItemDocument } from '@/order/schemas/order.schema';
 import { MessageDto } from '@/user/dto/message.dto';
 import { UnauthorizedError } from '@/common/custom-errors/auth/unauthorized.error';
@@ -16,7 +16,9 @@ import { UpdateOrderInput } from '@/order/dto/update-order.input';
 import { ProductDocument } from '@/product/schemas/product.schema';
 import { UserDocument } from '@/user/schemas/user.schema';
 import { CreateOrderInput } from '@/order/dto/create-order.input';
-import * as _ from 'lodash';
+import _ from 'lodash';
+import { Cache } from 'cache-manager';
+
 
 @Injectable()
 export class OrderService {
@@ -25,8 +27,7 @@ export class OrderService {
   constructor(
     @InjectModel('Order') private orderModel: Model<OrderDocument>,
     @InjectModel('OrderItem') private orderItemModel: Model<OrderItemDocument>,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
-    @InjectModel('Payment') private paymentModel: Model<PaymentDocument>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectModel('User') private userModel: Model<UserDocument>,
     @InjectModel('Product') private productModel: Model<ProductDocument>,
     @InjectConnection() private readonly connection: Connection
@@ -349,7 +350,7 @@ export class OrderService {
       };
 
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersData, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersData, pagination }));
 
       const ordersDto = ordersData.map(order => ({
         ...order.toObject(),
@@ -397,7 +398,7 @@ export class OrderService {
       const orderItemsData = await this.orderItemModel.find({ _id: { $in: order.orderItems } }).exec();
 
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ orderItemsData }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ orderItemsData }));
 
       const orderItemsDto = orderItemsData.map(item => ({
         ...item.toObject(),
@@ -452,7 +453,7 @@ export class OrderService {
         payment: order.payment.map((payment) => payment.toString())
       })) as unknown as OrderDto[];
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }));
 
       return { ordersData: ordersDto, pagination, statusCode: 200, ok: true };
     } catch (error) {
@@ -503,7 +504,7 @@ export class OrderService {
       })) as unknown as OrderDto[];
 
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }));
 
       return { ordersData: ordersDto, pagination, statusCode: 200, ok: true };
     } catch (error) {
@@ -553,7 +554,7 @@ export class OrderService {
         payment: order.payment.map((payment) => payment.toString())
       })) as unknown as OrderDto[];
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ orders: ordersDto, pagination }));
 
       return { ordersData: ordersDto, pagination, statusCode: 200, ok: true };
     } catch (error) {

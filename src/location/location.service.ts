@@ -2,7 +2,6 @@ import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CacheStore } from '@nestjs/cache-manager';
 import { CountryDocument, LgaDocument, LocationDocument, StateDocument } from '@/location/schemas/location.schema';
 import { MessageDto } from '@/user/dto/message.dto';
 import { CreateLocationInput } from '@/location/dto/create-location.input';
@@ -18,18 +17,19 @@ import {  LocationNotFoundError } from '@/common/custom-errors/location/location
 import { DeletionError } from '@/common/custom-errors/location/deletion.error';
 import { Connection } from 'mongoose';
 import { Addresses }  from '@/common/util/locations';
+import { Cache } from 'cache-manager';
 
 
 @Injectable()
 export class LocationService {
   constructor(
     @InjectModel('Location') private locationModel: Model<LocationDocument>,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectModel('Country') private countryModel: Model<CountryDocument>,
     @InjectModel('State') private stateModel: Model<StateDocument>,
     @InjectModel('Lga') private lgaModel: Model<LgaDocument>,
     @InjectModel('User') private userModel: Model<UserDocument>,
-    @InjectConnection() private readonly connection: Connection
+    @InjectConnection() private readonly connection: Connection,
   ) {}
   private readonly logger = new Logger(LocationService.name);
 
@@ -283,7 +283,7 @@ export class LocationService {
       }));
   
       // Save the data in the cache for 24 hours (86400 seconds)
-      await this.cacheManager.set(state, JSON.stringify(lgasData), { ttl: 86400 });
+      await this.cacheManager.set(state, JSON.stringify(lgasData));
   
       return { lgasData, statusCode: 200, ok: true };
     } catch (error) {
@@ -312,7 +312,7 @@ export class LocationService {
       }));
   
       // Save the data in the cache for 24 hours (86400 seconds)
-      await this.cacheManager.set(country, JSON.stringify(statesData), { ttl: 86400 });
+      await this.cacheManager.set(country, JSON.stringify(statesData));
   
       return { statesData, statusCode: 200, ok: true };
     } catch (error) {

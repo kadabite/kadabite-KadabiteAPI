@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { UserDocument } from '@/user/schemas/user.schema';
@@ -18,6 +18,8 @@ import { InvalidTokenError, TokenExpiredError } from '@/common/custom-errors/aut
 import * as bcrypt from 'bcrypt';
 import _ from 'lodash';
 import { ProductDocument } from '@/product/schemas/product.schema';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class UserService {
@@ -29,7 +31,8 @@ export class UserService {
     @InjectModel('Lga') private lgaModel: Model<LgaDocument>,
     @InjectModel('Location') private locationModel: Model<LocationDocument>,
     @InjectModel('Product') private productModel: Model<ProductDocument>,
-    @InjectConnection() private readonly connection: Connection
+    @InjectConnection() private readonly connection: Connection,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<MessageDto> {
@@ -91,14 +94,37 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<MessageDto> {
+  async findAll(page: number, limit: number): Promise<MessageDto> {
+    const cacheKey = `users_page_${page}_limit_${limit}`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData as string);
+      return parsedData;
+    }
+
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      const usersData = await this.userModel.find().session(session).exec();
+      const usersData = await this.userModel
+        .find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .session(session)
+        .exec();
+
+      const totalItems = await this.userModel.countDocuments().exec();
+      const totalPages = Math.ceil(totalItems / limit);
+      const pagination = {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        itemsPerPage: limit,
+      };
 
       await session.commitTransaction();
-      return { usersData, statusCode: 200, ok: true };
+      const result = { usersData, pagination, statusCode: 200, ok: true };
+      await this.cacheManager.set(cacheKey, JSON.stringify(result));
+      return result;
     } catch (error) {
       await session.abortTransaction();
       this.logger.error('Error fetching users: ' + (error as Error).message);

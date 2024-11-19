@@ -10,6 +10,8 @@ import { OrderNotFoundError } from '@/common/custom-errors/order/order-not-found
 import { PaymentNotFoundError } from '@/common/custom-errors/payment/payment-not-found.error';
 import { InvalidPaymentMethodError, InvalidCurrencyError, InvalidAmountError } from '@/common/custom-errors/payment/payment-errors.error';
 import { paymentMethods, currency } from '@/payment/schemas/payment.schema';
+import { UpdatePaymentInput } from '@/payment/dto/update-payment.input';
+import { CreatePaymentInput } from '@/payment/dto/create-payment.input';
 
 @Injectable()
 export class PaymentService {
@@ -22,7 +24,8 @@ export class PaymentService {
 
   ) {}
 
-  async createPayment(orderId: string, paymentMethod: string, currency: string, sellerAmount: number, dispatcherAmount: number, userId: string): Promise<MessageDto> {
+  async createPayment(createPaymentInput: CreatePaymentInput, userId: string): Promise<MessageDto> {
+    const { orderId, paymentMethod, currency, sellerAmount, dispatcherAmount } = createPaymentInput;
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
@@ -83,7 +86,8 @@ export class PaymentService {
     }
   }
 
-  async updatePayment(paymentId: string, status: string, userId: string): Promise<MessageDto> {
+  async updatePayment(updatePaymentInput: UpdatePaymentInput, userId: string): Promise<MessageDto> {
+    const { paymentId, status } = updatePaymentInput;
     const session = await this.connection.startSession();
     session.startTransaction();
     try {

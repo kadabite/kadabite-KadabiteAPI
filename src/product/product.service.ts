@@ -7,13 +7,13 @@ import { MessageDto } from '@/user/dto/message.dto';
 import { UserNotFoundError } from '@/common/custom-errors/user/user-not-found.error';
 import { UserDocument } from '@/user/schemas/user.schema';
 import mongoose, { Model, Connection } from 'mongoose';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { CategoryNotFoundError } from '@/common/custom-errors/user/category-not-found.error';
 import { ProductAlreadyExistsError } from '@/common/custom-errors/user/product-already-exists.error';
 import { ProductNotFoundError } from '@/common/custom-errors/user/product-not-found.error';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { CategoryDocument } from '@/category/schemas/category.schema';
-
+import { Cache } from 'cache-manager';
 
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ProductService {
   constructor(
     @InjectModel('Product') private productModel: Model<ProductDocument>,
     @InjectModel('User') private userModel: Model<UserDocument>,
-    @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectConnection() private readonly connection: Connection,
     @InjectModel('Category') private categoryModel: Model<CategoryDocument>,
   ) {}
@@ -116,7 +116,7 @@ export class ProductService {
       };
 
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ products: productsData, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ products: productsData, pagination }));
 
       const formattedProductsData = productsData.map(product => ({
         ...product.toObject(),
@@ -176,7 +176,7 @@ export class ProductService {
       };
 
       // Save the data in the cache for 1 hour (3600 seconds)
-      await this.cacheManager.set(cacheKey, JSON.stringify({ products: paginatedProducts, pagination }), { ttl: 3600 });
+      await this.cacheManager.set(cacheKey, JSON.stringify({ products: paginatedProducts, pagination }));
 
       const formattedPaginatedProducts = paginatedProducts.map(product => ({
         ...product.toObject(),
