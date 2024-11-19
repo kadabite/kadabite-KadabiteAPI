@@ -1,7 +1,7 @@
 type Mutation {
   createOrder(
     sellerId: ID!
-    dispatcherId: ID
+    dispatcherId: ID!
     deliveryAddress: String!
     orderItems: [OrderItems]!
   ): Message!

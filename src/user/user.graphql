@@ -28,8 +28,8 @@ type Message {
 
 type Mutation {
   createUser(
-    email: String
     password: String!
+    email: String
     phoneNumber: String
   ): Message!
   deleteUser: Message!
@@ -42,12 +42,12 @@ type Mutation {
     userType: String!
     email: String!
     phoneNumber: String!
-    longitude: String
-    latitude: String
     lga: String!
     state: String!
     country: String!
     address: String!
+    longitude: String
+    latitude: String
     vehicleNumber: String
   ): Message!
   updatePassword(email: String!, token: String!, password: String!): Message!
@@ -76,8 +76,7 @@ type Pagination {
 }
 
 type Query {
-  findFoods(productName: String!): Message!
-  thirdPartyUser(username: String!): ThirdPartyUser!
+  findFoods(productName: String!, page: Int, limit: Int): Message!
   user: Message!
   users(page: Int, limit: Int): Message!
 }
