@@ -8,14 +8,14 @@
 	"license": "ISC",
 	"scripts": {
 		"build": "nest build",
-		"start": "node dist/main.js",
+		"start": "node dist/src/main.js",
 		"start:dev": "nest start --watch",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
-		"start:prod": "node ."
+		"start:prod": "node dist/src/main.js"
 	},
 	"dependencies": {
 		"@apollo/server": "^4.11.2",
@@ -35,9 +35,12 @@
 		"bcrypt": "^5.1.1",
 		"bullmq": "^5.26.0",
 		"cache-manager": "^5.7.6",
+		"cache-manager-redis-store": "^3.0.1",
 		"cacheable": "^1.8.4",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.1",
+		"cookie-parser": "^1.4.7",
+		"csurf": "^1.11.0",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.1",
 		"graphql": "^16.9.0",
