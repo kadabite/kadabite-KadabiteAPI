@@ -1,14 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthResolver } from '@/auth/auth.resolver';
 import { AuthService } from '@/auth/auth.service';
 import { AuthGuard } from '@/auth/auth.guard';
-
+import { UserModule } from '@/user/user.module';
 
 @Module({
-  providers: [AuthService, AuthResolver],
+  providers: [AuthService, AuthResolver, AuthGuard, JwtService],
   imports: [
     MongooseModule,
     JwtModule.registerAsync({
@@ -20,7 +20,8 @@ import { AuthGuard } from '@/auth/auth.guard';
       }),
       inject: [ConfigService]
     }),
+    forwardRef(() => UserModule),
   ],
-  exports: [AuthGuard]
+  exports: [AuthGuard, AuthService, AuthResolver, JwtService],
 })
 export class AuthModule {}
