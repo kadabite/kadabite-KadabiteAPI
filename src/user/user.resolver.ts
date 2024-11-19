@@ -1,12 +1,14 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { UserService } from '@/user/user.service';
 import { MessageDto } from '@/user/dto/message.dto';
 import { CreateUserInput } from '@/user/dto/create-user.input';
 import { RegisterUserInput } from '@/user/dto/register-user.input';
 import { UpdateUserInput } from '@/user/dto/update-user.input';
-import { AuthService } from '@/auth/auth.service';
 import { AuthGuard } from '@/auth/auth.guard';
+import { FindFoodsInput } from '@/user/dto/find-foods.input';
+import { UpdatePasswordInput } from '@/user/dto/update-password.input';
+import { ForgotPasswordInput } from '@/user/dto/forgot-password.input';
 
 @Resolver(() => MessageDto)
 export class UserResolver {
@@ -15,12 +17,8 @@ export class UserResolver {
   ) {}
 
   @Mutation(() => MessageDto)
-  createUser(
-    @Args('email') email: string,
-    @Args('password') password: string,
-    @Args('phoneNumber', { nullable: true }) phoneNumber: string
-  ) {
-    return this.userService.create({ email, password, phoneNumber });
+  createUser(@Args() createUserInput: CreateUserInput) {
+    return this.userService.create(createUserInput);
   }
 
   @Mutation(() => MessageDto)
@@ -31,8 +29,8 @@ export class UserResolver {
   }
 
   @Mutation(() => MessageDto)
-  forgotPassword(@Args('email') email: string) {
-    return this.userService.forgotPassword(email);
+  forgotPassword(@Args() forgotPasswordInput: ForgotPasswordInput) {
+    return this.userService.forgotPassword(forgotPasswordInput.email);
   }
 
   @Mutation(() => MessageDto)
@@ -45,7 +43,7 @@ export class UserResolver {
   @Mutation(() => MessageDto)
   @UseGuards(AuthGuard)
   registerUser(
-    @Args('registerUserInput') registerUserInput: RegisterUserInput,
+    @Args() registerUserInput: RegisterUserInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
@@ -53,18 +51,18 @@ export class UserResolver {
   }
 
   @Mutation(() => MessageDto)
-  updatePassword(
-    @Args('email') email: string,
-    @Args('token') token: string,
-    @Args('password') password: string
-  ) {
-    return this.userService.updatePassword(email, token, password);
+  updatePassword(@Args() updatePasswordInput: UpdatePasswordInput) {
+    return this.userService.updatePassword(
+      updatePasswordInput.email,
+      updatePasswordInput.token,
+      updatePasswordInput.password
+    );
   }
 
   @Mutation(() => MessageDto)
   @UseGuards(AuthGuard)
   updateUser(
-    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+    @Args() updateUserInput: UpdateUserInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
@@ -79,14 +77,13 @@ export class UserResolver {
   }
 
   @Query(() => MessageDto, { name: 'users' })
-  findUsers() {
-    return this.userService.findAll();
+  findUsers(@Args('page', { type: () => Int }) page: number, @Args('limit', { type: () => Int }) limit: number) {
+    return this.userService.findAll(page, limit);
   }
 
   @Query(() => MessageDto, { name: 'findFoods' })
-  findFoods(@Args('productName') productName: string) {
-    const page = 4;
-    const limit = 3;
-    return this.userService.findFoods(productName, page, limit);
+  findFoods(
+    @Args() productInfo: FindFoodsInput) {
+    return this.userService.findFoods(productInfo.productName, productInfo.page, productInfo.limit);
   }
 }

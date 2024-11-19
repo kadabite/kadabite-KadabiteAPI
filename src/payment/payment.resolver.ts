@@ -14,26 +14,21 @@ export class PaymentResolver {
   @Mutation(() => PaymentDto)
   @UseGuards(AuthGuard)
   createPayment(
-    @Args('orderId', { type: () => ID }) orderId: string,
-    @Args('paymentMethod', { type: () => String }) paymentMethod: string,
-    @Args('currency', { type: () => String }) currency: string,
-    @Args('sellerAmount', { type: () => Number }) sellerAmount: number,
-    @Args('dispatcherAmount', { type: () => Number }) dispatcherAmount: number,
+    @Args() createPaymentInput: CreatePaymentInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.paymentService.createPayment(orderId, paymentMethod, currency, sellerAmount, dispatcherAmount, userId);
+    return this.paymentService.createPayment(createPaymentInput, userId);
   }
 
   @Mutation(() => PaymentDto)
   @UseGuards(AuthGuard)
   updatePayment(
-    @Args('paymentId', { type: () => ID }) paymentId: string,
-    @Args('status', { type: () => String }) status: string,
+    @Args() updatePaymentInput: UpdatePaymentInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.paymentService.updatePayment(paymentId, status, userId);
+    return this.paymentService.updatePayment(updatePaymentInput, userId);
   }
 
   @Query(() => PaymentDto, { name: 'getMyPayment' })

@@ -5,12 +5,9 @@ import { OrderDto } from '@/order/dto/order.dto';
 import { CreateOrderInput } from '@/order/dto/create-order.input';
 import { DeleteOrderItemInput } from '@/order/dto/delete-order-item.input';
 import { DeleteOrderInput } from '@/order/dto/delete-order.input';
-import { DeleteOrderItemsNowInput } from '@/order/dto/delete-order-items-now.input';
 import { UpdateOrderInput } from '@/order/dto/update-order.input';
 import { UpdateOrderItemsInput } from '@/order/dto/update-order-items.input';
 import { AuthGuard } from '@/auth/auth.guard';
-import { OrderItemsInput } from '@/order/dto/order-items.input';
-import { OrderItem2Input } from '@/order/dto/order-item2.input';
 import { MessageDto } from '@/user/dto/message.dto';
 
 @Resolver(() => OrderDto)
@@ -20,57 +17,52 @@ export class OrderResolver {
   @Mutation(() => OrderDto)
   @UseGuards(AuthGuard)
   createOrder(
-    @Args('sellerId') sellerId: string,
-    @Args('dispatcherId', { nullable: true }) dispatcherId: string,
-    @Args('deliveryAddress') deliveryAddress: string,
-    @Args('orderItems') orderItems: OrderItemsInput[],
+    @Args() createOrderInput: CreateOrderInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.orderService.create({ sellerId, dispatcherId, deliveryAddress, orderItems }, userId);
+    return this.orderService.create(createOrderInput, userId);
   }
 
   @Mutation(() => OrderDto)
   @UseGuards(AuthGuard)
   deleteAnOrderItem(
-    @Args('orderId', { type: () => ID }) orderId: string, 
-    @Args('orderItemId', { type: () => ID }) orderItemId: string,
+    @Args() deleteOrderItemInput: DeleteOrderItemInput,
     @Context() context) {
     const userId = context.req.user.sub;
-    return this.orderService.deleteOrderItem(orderId, orderItemId, userId);
+    return this.orderService.deleteOrderItem(
+      deleteOrderItemInput.orderId,
+      deleteOrderItemInput.orderItemId,
+      userId);
   }
 
   @Mutation(() => OrderDto)
   @UseGuards(AuthGuard)
   deleteOrder(
-    @Args('orderId') orderId: string,
+    @Args() deleteOrderInput: DeleteOrderInput,
     @Context() context) {
     const userId = context.req.user.sub;
-    return this.orderService.delete(orderId, userId);
+    return this.orderService.delete(deleteOrderInput.orderId, userId);
   }
 
   @Mutation(() => OrderDto)
   @UseGuards(AuthGuard)
   async updateOrder(
-    @Args('orderId') orderId: string,
+    @Args() updateOrderInput: UpdateOrderInput,
     @Context() context,
-    @Args('deliveryAddress', { nullable: true }) deliveryAddress?: string,
-    @Args('receivedByBuyer', { nullable: true }) recievedByBuyer?: boolean,
-    @Args('deliveredByDispatcher', { nullable: true }) deliveredByDispatcher?: boolean,
   ): Promise<MessageDto> {
     const userId = context.req.user.sub;
-    return this.orderService.update({ orderId, deliveryAddress, recievedByBuyer, deliveredByDispatcher }, userId);
+    return this.orderService.update(updateOrderInput, userId);
   }
 
   @Mutation(() => OrderDto)
   @UseGuards(AuthGuard)
   updateOrderItems(
-    @Args('orderId') orderId: string,
-    @Args('orderItems') orderItems: OrderItem2Input[],
+    @Args() updateOrderItemsInput: UpdateOrderItemsInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.orderService.updateOrderItems(orderId, orderItems, userId);
+    return this.orderService.updateOrderItems(updateOrderItemsInput.orderId, updateOrderItemsInput.orderItems, userId);
   }
 
   @Query(() => [OrderDto], { name: 'getAllOrders' })

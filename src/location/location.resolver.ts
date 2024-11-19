@@ -5,7 +5,6 @@ import { LocationDto } from '@/location/dto/location.dto';
 import { CreateLocationInput } from '@/location/dto/create-location.input';
 import { AddUserLocationInput } from '@/location/dto/add-user-location.input';
 import { UpdateUserLocationInput } from '@/location/dto/update-user-location.input';
-import { DeleteUserLocationInput } from '@/location/dto/delete-user-location.input';
 import { CountryDto } from '@/location/dto/country.dto';
 import { LgaDto } from '@/location/dto/lga.dto';
 import { StateDto } from '@/location/dto/state.dto';
@@ -26,32 +25,21 @@ export class LocationResolver {
   @Mutation(() => LocationDto)
   @UseGuards(AuthGuard)
   addUserLocation(
-    @Args('address', { type: () => String }) address: string,
-    @Args('lga', { type: () => String, nullable: true }) lga: string,
-    @Args('state', { type: () => String, nullable: true }) state: string,
-    @Args('country', { type: () => String, nullable: true }) country: string,
-    @Args('longitude', { type: () => String, nullable: true }) longitude: string,
-    @Args('latitude', { type: () => String, nullable: true }) latitude: string,
+    @Args() addUserLocationInput: AddUserLocationInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.locationService.addUserLocation({ address, lga, state, country, longitude, latitude }, userId);
+    return this.locationService.addUserLocation(addUserLocationInput, userId);
   }
 
   @Mutation(() => LocationDto)
   @UseGuards(AuthGuard)
   updateUserLocation(
-    @Args('locationId', { type: () => ID }) locationId: string,
-    @Args('address', { type: () => String }) address: string,
-    @Args('lga', { type: () => String }) lga: string,
-    @Args('state', { type: () => String }) state: string,
-    @Args('country', { type: () => String }) country: string,
-    @Args('longitude', { type: () => String }) longitude: string,
-    @Args('latitude', { type: () => String }) latitude: string,
+    @Args() updateUserLocationInput: UpdateUserLocationInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    return this.locationService.updateUserLocation({ locationId, address, lga, state, country, longitude, latitude }, userId);
+    return this.locationService.updateUserLocation(updateUserLocationInput, userId);
   }
 
   @Mutation(() => LocationDto)

@@ -13,20 +13,20 @@ export class CategoryResolver {
 
   @Mutation(() => CategoryDto)
   @UseGuards(AuthGuard)
-  createCategory(@Args('name') name: string) {
-    return this.categoryService.create({ name });
+  createCategory(@Args() createCategoryInput: CreateCategoryInput) {
+    return this.categoryService.create(createCategoryInput);
   }
 
   @Mutation(() => [CategoryDto])
   @UseGuards(AuthGuard)
-  createCategories(@Args('name') name: string[]) {
-    return this.categoryService.createMany({ name });
+  createCategories(@Args() createCategoriesInput: CreateCategoriesInput) {
+    return this.categoryService.createMany(createCategoriesInput);
   }
 
   @Mutation(() => CategoryDto)
   @UseGuards(AuthGuard)
-  deleteCategory(@Args('id', { type: () => ID }) id: string) {
-    return this.categoryService.delete(id);
+  deleteCategory(@Args() deleteCategoryInput: DeleteCategoryInput) {
+    return this.categoryService.delete(deleteCategoryInput.id);
   }
 
   @Query(() => [CategoryDto], { name: 'categories' })

@@ -13,31 +13,20 @@ export class ProductResolver {
   @Mutation(() => ProductDto)
   @UseGuards(AuthGuard)
   createProduct(
-    @Args('name') name: string,
-    @Args('description') description: string,
-    @Args('price') price: number,
-    @Args('currency') currency: string,
-    @Args('categoryId') categoryId: string,
+    @Args() createProductInput: CreateProductInput,
     @Context() context
   ) {
     const userId = context.req.user.sub;
-    const createProductInput: CreateProductInput = { name, description, price, currency, categoryId };
     return this.productService.create(createProductInput, userId);
   }
 
   @Mutation(() => ProductDto)
   @UseGuards(AuthGuard)
   updateProduct(
-    @Args('id') id: string,
-    @Context() context,
-    @Args('currency', { nullable: true }) currency?: string,
-    @Args('description', { nullable: true }) description?: string,
-    @Args('name', { nullable: true }) name?: string,
-    @Args('photo', { nullable: true }) photo?: string,
-    @Args('price', { nullable: true }) price?: number,
+    @Args() updateProductInput: UpdateProductInput,
+    @Context() context
   ) {
     const userId = context.req.user.sub;
-    const updateProductInput: UpdateProductInput = { id, currency, description, name, photo, price };
     return this.productService.update(updateProductInput, userId);
   }
 
