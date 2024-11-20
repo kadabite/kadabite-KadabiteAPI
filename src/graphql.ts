@@ -84,13 +84,9 @@ export abstract class IMutation {
     abstract updateUser(firstName?: Nullable<string>, lastName?: Nullable<string>, longitude?: Nullable<string>, latitude?: Nullable<string>, userName?: Nullable<string>, lga?: Nullable<string>, state?: Nullable<string>, country?: Nullable<string>, address?: Nullable<string>, buyerStatus?: Nullable<string>, sellerStatus?: Nullable<string>, dispatcherStatus?: Nullable<string>, vehicleNumber?: Nullable<string>): Message | Promise<Message>;
 }
 
-export class Category {
-    id: string;
-    name: string;
-    products?: Nullable<Nullable<Product>[]>;
-}
-
 export abstract class IQuery {
+    abstract getNewAccessToken(refreshToken: string): Message | Promise<Message>;
+
     abstract categories(): Message | Promise<Message>;
 
     abstract category(id: string): Message | Promise<Message>;
@@ -130,6 +126,12 @@ export abstract class IQuery {
     abstract user(): Message | Promise<Message>;
 
     abstract users(page?: Nullable<number>, limit?: Nullable<number>): Message | Promise<Message>;
+}
+
+export class Category {
+    id: string;
+    name: string;
+    products?: Nullable<Nullable<Product>[]>;
 }
 
 export class Country {
@@ -267,12 +269,6 @@ export class Restaurant {
     price?: Nullable<number>;
     products: Nullable<string>[];
     userId: string;
-    username: string;
-}
-
-export class ThirdPartyUser {
-    email: string;
-    passwordHash: string;
     username: string;
 }
 

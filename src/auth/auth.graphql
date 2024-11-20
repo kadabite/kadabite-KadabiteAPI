@@ -1,3 +1,7 @@
 type Mutation {
     login(email: String!, password: String!): Message!
 }
+
+type Query {
+    getNewAccessToken(refreshToken: String!): Message!
+}

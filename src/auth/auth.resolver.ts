@@ -10,8 +10,13 @@ export class AuthResolver {
   ) {}
 
   @Mutation(() => MessageDto)
-  login(@Args('loginInput') loginInput: LoginInput) {
+  login(@Args() loginInput: LoginInput) {
     const { email, password } = loginInput;
     return this.authService.signIn(email, password);
+  }
+
+  @Query(() => MessageDto, { name: 'getNewAccessToken' })
+  accessToken(@Args('refreshToken') refreshToken: string) {
+    return this.authService.getNewAccessToken(refreshToken);
   }
 }

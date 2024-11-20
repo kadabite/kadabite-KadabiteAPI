@@ -17,9 +17,9 @@ export class LocationResolver {
 
   @Mutation(() => LocationDto)
   @UseGuards(AuthGuard)
-  createLocation(@Args('location') location: CreateLocationInput) {
+  createLocation(@Args() location: CreateLocationInput) {
 
-    return this.locationService.create(location, addressesData);
+    return this.locationService.create(location.location, addressesData);
   }
 
   @Mutation(() => LocationDto)

@@ -98,12 +98,6 @@ type Restaurant {
   username: String!
 }
 
-type ThirdPartyUser {
-  email: String!
-  passwordHash: String!
-  username: String!
-}
-
 type User {
   addressBuyer: [Location]
   addressDispatcher: [Location]

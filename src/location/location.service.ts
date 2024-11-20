@@ -32,7 +32,7 @@ export class LocationService {
   ) {}
   private readonly logger = new Logger(LocationService.name);
 
-  async create(createLocationInput: CreateLocationInput, addressesData: Addresses): Promise<MessageDto> {
+  async create(createLocationInput: string, addressesData: Addresses): Promise<MessageDto> {
     const session = await this.connection.startSession();
 
     session.startTransaction();
