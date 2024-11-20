@@ -1,0 +1,4 @@
+2024-11-20 10:33:17,616 - DEBUG - Using selector: EpollSelector
+2024-11-20 10:33:17,616 - INFO - Worker is running and waiting for jobs...
+2024-11-20 11:10:36,920 - INFO - Received job: id=66e08fb7228b5a2270d1e65b
+2024-11-20 11:10:41,098 - INFO - Processed job: id=66e08fb7228b5a2270d1e65b

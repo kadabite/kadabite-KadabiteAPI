@@ -1,0 +1,8 @@
+click==8.1.7
+Deprecated==1.2.14
+python-dotenv==0.19.2
+redis==4.0.2
+rq==1.10.0
+setuptools==75.1.0
+tenacity==8.0.1
+wrapt==1.16.0
