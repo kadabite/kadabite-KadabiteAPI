@@ -16,31 +16,31 @@ export class UserResolver {
     private readonly userService: UserService,
   ) {}
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Create a new user' })
   createUser(@Args() createUserInput: CreateUserInput) {
     return this.userService.create(createUserInput);
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Delete an existing user' })
   @UseGuards(AuthGuard)
   deleteUser(@Context() context) {
     const userId = context.req.user.sub;
     return this.userService.remove(userId);
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Initiate forgot password process' })
   forgotPassword(@Args() forgotPasswordInput: ForgotPasswordInput) {
     return this.userService.forgotPassword(forgotPasswordInput.email);
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Logout the current user' })
   @UseGuards(AuthGuard)
   logout(@Context() context) {
     const userId = context.req.user.sub;
     return this.userService.logout(userId);
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Register a new user' })
   @UseGuards(AuthGuard)
   registerUser(
     @Args() registerUserInput: RegisterUserInput,
@@ -50,7 +50,7 @@ export class UserResolver {
     return this.userService.register(registerUserInput, userId);
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Update user password' })
   updatePassword(@Args() updatePasswordInput: UpdatePasswordInput) {
     return this.userService.updatePassword(
       updatePasswordInput.email,
@@ -59,7 +59,7 @@ export class UserResolver {
     );
   }
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Update user information' })
   @UseGuards(AuthGuard)
   updateUser(
     @Args() updateUserInput: UpdateUserInput,
@@ -69,14 +69,14 @@ export class UserResolver {
     return this.userService.update(userId, updateUserInput);
   }
 
-  @Query(() => MessageDto, { name: 'user' })
+  @Query(() => MessageDto, { name: 'user', description: 'Find a user by ID' })
   @UseGuards(AuthGuard)
   findUser(@Context() context) {
     const userId = context.req.user.sub;
     return this.userService.findOne(userId);
   }
 
-  @Query(() => MessageDto, { name: 'users' })
+  @Query(() => MessageDto, { name: 'users', description: 'Find all users with pagination' })
   findUsers(@Args('page', { type: () => Int }) page: number, @Args('limit', { type: () => Int }) limit: number) {
     if (page <= 0) {
       page = 1;
@@ -84,7 +84,7 @@ export class UserResolver {
     return this.userService.findAll(page, limit);
   }
 
-  @Query(() => MessageDto, { name: 'findFoods' })
+  @Query(() => MessageDto, { name: 'findFoods', description: 'Find foods based on product information' })
   findFoods(
     @Args() productInfo: FindFoodsInput) {
     return this.userService.findFoods(productInfo.productName, productInfo.page, productInfo.limit);

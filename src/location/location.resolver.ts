@@ -15,14 +15,13 @@ import { AuthGuard } from '@/auth/auth.guard';
 export class LocationResolver {
   constructor(private readonly locationService: LocationService) {}
 
-  @Mutation(() => LocationDto)
+  @Mutation(() => LocationDto, { description: 'Create a new location' })
   @UseGuards(AuthGuard)
   createLocation(@Args() location: CreateLocationInput) {
-
     return this.locationService.create(location.location, addressesData);
   }
 
-  @Mutation(() => LocationDto)
+  @Mutation(() => LocationDto, { description: 'Add a location to the current user' })
   @UseGuards(AuthGuard)
   addUserLocation(
     @Args() addUserLocationInput: AddUserLocationInput,
@@ -32,7 +31,7 @@ export class LocationResolver {
     return this.locationService.addUserLocation(addUserLocationInput, userId);
   }
 
-  @Mutation(() => LocationDto)
+  @Mutation(() => LocationDto, { description: 'Update a location of the current user' })
   @UseGuards(AuthGuard)
   updateUserLocation(
     @Args() updateUserLocationInput: UpdateUserLocationInput,
@@ -42,29 +41,29 @@ export class LocationResolver {
     return this.locationService.updateUserLocation(updateUserLocationInput, userId);
   }
 
-  @Mutation(() => LocationDto)
+  @Mutation(() => LocationDto, { description: 'Delete a location of the current user' })
   @UseGuards(AuthGuard)
   deleteUserLocation(@Args('locationId', { type: () => ID }) locationId: string, @Context() context) {
     const userId = context.req.user.sub;
     return this.locationService.deleteUserLocation(locationId, userId);
   }
 
-  @Query(() => [CountryDto], { name: 'getCountries' })
+  @Query(() => [CountryDto], { name: 'getCountries', description: 'Get all countries' })
   getCountries() {
     return this.locationService.getCountries();
   }
 
-  @Query(() => [LgaDto], { name: 'getLgas' })
+  @Query(() => [LgaDto], { name: 'getLgas', description: 'Get all LGAs of a state' })
   getLgas(@Args('state', { type: () => String }) state: string) {
     return this.locationService.getLgas(state);
   }
 
-  @Query(() => [StateDto], { name: 'getStates' })
+  @Query(() => [StateDto], { name: 'getStates', description: 'Get all states of a country' })
   getStates(@Args('country', { type: () => String }) country: string) {
     return this.locationService.getStates(country);
   }
 
-  @Query(() => [LocationDto], { name: 'getUserLocations' })
+  @Query(() => [LocationDto], { name: 'getUserLocations', description: 'Get all locations of the current user' })
   @UseGuards(AuthGuard)
   getUserLocations(@Context() context) {
     const userId = context.req.user.sub;

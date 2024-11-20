@@ -9,13 +9,13 @@ export class AuthResolver {
     private readonly authService: AuthService
   ) {}
 
-  @Mutation(() => MessageDto)
+  @Mutation(() => MessageDto, { description: 'Login a user' })
   login(@Args() loginInput: LoginInput) {
     const { email, password } = loginInput;
     return this.authService.signIn(email, password);
   }
 
-  @Query(() => MessageDto, { name: 'getNewAccessToken' })
+  @Query(() => MessageDto, { name: 'getNewAccessToken', description: 'Get a new access token using a refresh token' })
   accessToken(@Args('refreshToken') refreshToken: string) {
     return this.authService.getNewAccessToken(refreshToken);
   }

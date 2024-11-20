@@ -11,7 +11,7 @@ import { AuthGuard } from '@/auth/auth.guard';
 export class PaymentResolver {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Mutation(() => PaymentDto)
+  @Mutation(() => PaymentDto, { description: 'Create a new payment' })
   @UseGuards(AuthGuard)
   createPayment(
     @Args() createPaymentInput: CreatePaymentInput,
@@ -21,7 +21,7 @@ export class PaymentResolver {
     return this.paymentService.createPayment(createPaymentInput, userId);
   }
 
-  @Mutation(() => PaymentDto)
+  @Mutation(() => PaymentDto, { description: 'Update an existing payment' })
   @UseGuards(AuthGuard)
   updatePayment(
     @Args() updatePaymentInput: UpdatePaymentInput,
@@ -31,7 +31,7 @@ export class PaymentResolver {
     return this.paymentService.updatePayment(updatePaymentInput, userId);
   }
 
-  @Query(() => PaymentDto, { name: 'getMyPayment' })
+  @Query(() => PaymentDto, { name: 'getMyPayment', description: 'Get payment details for a specific order' })
   @UseGuards(AuthGuard)
   getMyPayment(@Args('orderId', { type: () => ID }) orderId: string, @Context() context) {
     const userId = context.req.user.sub;

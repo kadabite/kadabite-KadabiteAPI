@@ -11,30 +11,30 @@ import { AuthGuard } from '@/auth/auth.guard';
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Mutation(() => CategoryDto)
+  @Mutation(() => CategoryDto, { description: 'Create a new category' })
   @UseGuards(AuthGuard)
   createCategory(@Args() createCategoryInput: CreateCategoryInput) {
     return this.categoryService.create(createCategoryInput);
   }
 
-  @Mutation(() => [CategoryDto])
+  @Mutation(() => [CategoryDto], { description: 'Create multiple categories' })
   @UseGuards(AuthGuard)
   createCategories(@Args() createCategoriesInput: CreateCategoriesInput) {
     return this.categoryService.createMany(createCategoriesInput);
   }
 
-  @Mutation(() => CategoryDto)
+  @Mutation(() => CategoryDto, { description: 'Delete a category by ID' })
   @UseGuards(AuthGuard)
   deleteCategory(@Args() deleteCategoryInput: DeleteCategoryInput) {
     return this.categoryService.delete(deleteCategoryInput.id);
   }
 
-  @Query(() => [CategoryDto], { name: 'categories' })
+  @Query(() => [CategoryDto], { name: 'categories', description: 'Get all categories' })
   findAll() {
     return this.categoryService.findAll();
   }
 
-  @Query(() => CategoryDto, { name: 'category' })
+  @Query(() => CategoryDto, { name: 'category', description: 'Get a category by ID' })
   findOne(@Args('id', { type: () => ID }) id: string) {
     return this.categoryService.findOne(id);
   }
