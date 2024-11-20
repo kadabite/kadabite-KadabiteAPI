@@ -4,3 +4,5 @@ config
 .env
 .env.local
 .env.development.local
+venv
+redis-data
