@@ -78,6 +78,9 @@ export class UserResolver {
 
   @Query(() => MessageDto, { name: 'users' })
   findUsers(@Args('page', { type: () => Int }) page: number, @Args('limit', { type: () => Int }) limit: number) {
+    if (page <= 0) {
+      page = 1;
+    }
     return this.userService.findAll(page, limit);
   }
 

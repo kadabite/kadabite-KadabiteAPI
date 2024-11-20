@@ -1,3 +1,4 @@
+import { UserDocument } from '@/user/schemas/user.schema';
 import {
     CanActivate,
     ExecutionContext,
@@ -6,14 +7,17 @@ import {
   } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
       private configService: ConfigService,
-      private jwtService: JwtService
-  ) {}
+      private jwtService: JwtService,
+      @InjectModel('User') private userModel: Model<UserDocument>,
+    ) {}
 
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
@@ -29,6 +33,12 @@ export class AuthGuard implements CanActivate {
           secret: this.configService.get('SECRET')
         }
       );
+      // verify if the user is logged in using "isLoggedIn" field
+      const user = await this.userModel.findById(payload.sub);
+      if (!user || !user.isLoggedIn) {
+        throw new UnauthorizedException();
+      }
+
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();

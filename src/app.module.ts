@@ -10,30 +10,35 @@ import { PaymentModule } from '@/payment/payment.module';
 import { OrderModule } from '@/order/order.module';
 import { LocationModule } from '@/location/location.module';
 import { CategoryModule } from '@/category/category.module';
-import { BullModule } from '@nestjs/bullmq';
+// import { BullModule } from '@nestjs/bullmq';
 import { AuthModule } from '@/auth/auth.module';
 import { CsrfMiddleware } from '@/common/middleware/csrf.middleware';
 import { RefererOriginMiddleware } from '@/common/middleware/referrer-origin.middleware';
-import { GlobalsModule } from './globals/globals.module';
+import { GlobalsModule } from '@/globals/globals.module';
+// import { EmailService } from '@/email/email.service';
 import * as cookieParser from 'cookie-parser';
-
+// import { UserProcessor } from '@/user/user.processor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        connection: {
-          host: configService.get<string>('REDIS_HOST'),
-          port: configService.get<number>('REDIS_PORT'),
-        },
-        isGlobal: true,
-      }),
-      inject: [ConfigService],
-    }),
+    // BullModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     connection: {
+    //       host: configService.get<string>('REDIS_HOST'),
+    //       port: configService.get<number>('REDIS_PORT'),
+    //     },
+    //     isGlobal: true,
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    // BullModule.registerQueue({
+    //   name: 'user_data_queue',
+    //   processors: [join(process.cwd(), 'src/user/user.processor.ts')],
+    // }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       typePaths: ['./**/*.graphql'],

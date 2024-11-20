@@ -45,7 +45,9 @@ export class AuthService {
         await this.userModel.findByIdAndUpdate(user.id, { isLoggedIn: true }).session(session);
 
         // Generate JWT with user ID and expiration time
-        const accessToken = await this.jwtService.signAsync(payload);
+        const accessToken = await this.jwtService.signAsync(payload, {
+          expiresIn: '1d'
+        });
         // const accessToken = jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET_KEY as string, {
         //   expiresIn: `${process.env.NEXT_PUBLIC_ACCESS_TOKEN_EXPIRES_IN}d`,
         // });

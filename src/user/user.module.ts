@@ -32,6 +32,10 @@ import { ProductModule } from '@/product/product.module';
     forwardRef(() => LocationModule),
     forwardRef(() => ProductModule),
   ],
-  exports: [MongooseModule, UserService, UserResolver, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
+  exports: [
+    MongooseModule,
+    UserService,
+    UserResolver,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
 })
 export class UserModule {}

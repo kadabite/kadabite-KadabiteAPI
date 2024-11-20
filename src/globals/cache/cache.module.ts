@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
 @Global()
 @Module({
@@ -37,6 +37,19 @@ import { createClient } from 'redis';
       inject: [ConfigService],
     }),
   ],
-  exports: [CacheModule],
+  providers: [
+    {
+      provide: 'REDIS_CLIENT',
+      useFactory: async (configService: ConfigService) => {
+        const redisClient = createClient({
+          url: `redis://${configService.get<string>('REDIS_HOST', 'localhost')}:${configService.get<number>('REDIS_PORT', 6379)}`,
+        });
+        await redisClient.connect();
+        return redisClient;
+      },
+      inject: [ConfigService],
+    }
+  ],
+  exports: [CacheModule, 'REDIS_CLIENT'],
 })
 export class SharedCacheModule {}

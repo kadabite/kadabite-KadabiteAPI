@@ -16,10 +16,13 @@ import { StateNotFoundError } from '@/common/custom-errors/location/state-not-fo
 import { LgaNotFoundError } from '@/common/custom-errors/location/lga-not-found.error';
 import { InvalidTokenError, TokenExpiredError } from '@/common/custom-errors/auth/unauthorized.error';
 import * as bcrypt from 'bcrypt';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ProductDocument } from '@/product/schemas/product.schema';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { v4 as uuidv4 } from 'uuid';
+import { RedisClientType } from 'redis';
+
 
 @Injectable()
 export class UserService {
@@ -32,7 +35,8 @@ export class UserService {
     @InjectModel('Location') private locationModel: Model<LocationDocument>,
     @InjectModel('Product') private productModel: Model<ProductDocument>,
     @InjectConnection() private readonly connection: Connection,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject('REDIS_CLIENT') private redisClient: RedisClientType,
   ) {}
 
   async create(createUserInput: CreateUserInput): Promise<MessageDto> {
@@ -263,8 +267,44 @@ export class UserService {
   }
 
   async forgotPassword(email: string): Promise<MessageDto> {
-    // Implement logic for forgot password
-    return { message: 'Password reset email sent', ok: true, statusCode: 200 };
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      email = _.trim(email);
+      const user = await this.userModel.findOne({ email }).session(session);
+      if (!user) {
+        return { message: 'User was not found!', statusCode: 404, ok: true };
+      }
+
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 1);
+      const token = uuidv4() + uuidv4();
+      const resetPasswordToken = `${token} ${expiryDate.toISOString()}`;
+
+      const updated = await this.userModel.findByIdAndUpdate(user.id, { resetPasswordToken }).session(session);
+      if (!updated) {
+        return { message: 'Could not update user!', statusCode: 500, ok: true };
+      }
+
+      const user_data = {
+        id: user.id,
+        to: email,
+        subject: "Reset token for forgot password",
+        token,
+        uri: undefined,
+      };
+
+      await this.redisClient.lPush('user_data_queue', JSON.stringify(user_data));
+
+      await session.commitTransaction();
+      return { message: 'Get the reset token from your email', statusCode: 200, ok: true };
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Error changing password: ' + (error as Error).message);
+      return { message: 'An error occurred!', statusCode: 500, ok: true };
+    } finally {
+      session.endSession();
+    }
   }
 
   async logout(userId: string): Promise<MessageDto> {

@@ -22,6 +22,6 @@ import { UserModule } from '@/user/user.module';
     }),
     forwardRef(() => UserModule),
   ],
-  exports: [AuthGuard, AuthService, AuthResolver, JwtService],
+  exports: [AuthGuard, AuthService, AuthResolver, JwtService, MongooseModule],
 })
 export class AuthModule {}
