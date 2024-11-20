@@ -1,0 +1,52 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"  # Default Redis port
+    volumes: 
+      - type: bind
+        source: ./redis-data
+        target: /data
+    restart: always
+
+  worker:
+    build: ./email_service
+    container_name: worker
+    command: python worker.py
+    depends_on:
+      - redis
+    volumes:
+      - type: bind
+        source: ./email_service/email.log
+        target: /usr/src/app/email.log
+    restart: always
+
+  # mongodb:
+  #   image: mongodb/mongodb-community-server
+  #   env_file:
+  #     - ./Next_fullStack_food_Delivery_app/mongodb.env
+  #   ports:
+  #     - "27017:27017"
+  #   volumes: 
+  #     - type: bind
+  #       source: ./database_mongo
+  #       target: /data/db
+
+#   redis-enterprise:
+#     image: redislabs/redis:latest
+#     container_name: redis-enterprise
+#     env_file:
+#       - ./Next_fullStack_food_Delivery_app/redis.env
+#     ports:
+#       - "8443:8443"  # Management UI
+#       - "9443:9443"  # Additional port
+#       - "12000:12000" # Redis cluster port
+#       - "6379:6379"  # Redis endpoint for client connections
+#     volumes:
+#       - redis-enterprise-data:/var/opt/redislabs
+#     cap_add:
+#       - sys_resource
+
+# volumes:
+#   redis-enterprise-data:
