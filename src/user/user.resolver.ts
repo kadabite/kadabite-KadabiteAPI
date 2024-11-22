@@ -77,6 +77,7 @@ export class UserResolver {
   }
 
   @Query(() => MessageDto, { name: 'users', description: 'Find all users with pagination' })
+  @UseGuards(AuthGuard)
   findUsers(@Args('page', { type: () => Int }) page: number, @Args('limit', { type: () => Int }) limit: number) {
     if (page <= 0) {
       page = 1;

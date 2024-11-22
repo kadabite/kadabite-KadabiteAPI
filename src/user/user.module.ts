@@ -3,7 +3,7 @@ import { UserService } from '@/user/user.service';
 import { UserResolver } from '@/user/user.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema, UserDocument } from '@/user/schemas/user.schema';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { AuthModule } from '@/auth/auth.module';
 import { LocationModule } from '@/location/location.module';
 import { ProductModule } from '@/product/product.module';
@@ -15,7 +15,7 @@ import { ProductModule } from '@/product/product.module';
       [
         { 
           name: User.name,
-          useFactory: () => {
+          useFactory: async () => {
             const schema = UserSchema;
             schema.pre('save', async function () {
               const user = this as UserDocument;

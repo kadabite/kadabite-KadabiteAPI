@@ -43,17 +43,22 @@ export class UserService {
     const session = await this.connection.startSession();
     session.startTransaction();
     try {
-      const { email, password, phoneNumber } = createUserInput;
+      let { email, password, phoneNumber } = createUserInput;
+      email = _.trim(email);
+      password = _.trim(password);
+      phoneNumber = _.trim(phoneNumber)
 
-      // Check if email or phoneNumber is provided
-      if (!email && !phoneNumber) {
-        throw new InvalidCredentialsError('Email or phone number must be provided');
+      // Check phoneNumber is provided
+      if (!phoneNumber) {
+        throw new InvalidCredentialsError('Phone number must be provided');
       }
 
       // Check if email or phoneNumber is already taken
       let existingUser: UserDocument;
       if (email) {
         existingUser = await this.userModel.findOne({ email }).session(session);
+        const phone = await this.userModel.findOne({ phoneNumber }).session(session);
+        if (phone) throw new UserAlreadyExistsError('Phone number already registered!');
       } else if (phoneNumber) {
         existingUser = await this.userModel.findOne({ phoneNumber }).session(session);
       } else {
@@ -76,14 +81,15 @@ export class UserService {
       // Create new user
       const newUser = new this.userModel({
         username: _.trim(username),
-        email: email ? _.trim(email) : '',
-        passwordHash: _.trim(password),
-        phoneNumber: phoneNumber ? _.trim(phoneNumber) : '',
+        email: email ? email : 'fakeMail@Fake.com',
+        passwordHash: password,
+        phoneNumber: phoneNumber,
         isRegistered: false, // Set isRegistered to false
       });
       const userData = await newUser.save({ session });
+      const data = this.toUserDto(userData);
       await session.commitTransaction();
-      return { userData: this.toUserDto(userData), statusCode: 201, ok: true, message: 'User has been registered successfully!' };
+      return { userData: data, statusCode: 201, ok: true, message: 'User has been registered successfully!' };
     } catch (error) {
       await session.abortTransaction();
       this.logger.error('Error creating user: ' + (error as Error).message);
@@ -483,6 +489,7 @@ export class UserService {
         .find({ name: new RegExp(_.trim(productName), 'i') })
         .skip((page - 1) * limit)
         .limit(limit)
+        .session(session)
         .exec();
 
       if (!productsData || productsData.length === 0) {
@@ -492,9 +499,9 @@ export class UserService {
       // Fetch user information and map the data
       const foodsData = await Promise.all(productsData.map(async (data) => {
         const user = await this.userModel.findById(data.userId).session(session);
-        const location = await this.locationModel.findById(user?.addressSeller).exec();
+        const location = await this.locationModel.findById(user?.addressSeller).session(session).exec();
         return {
-          id: data._id.toString(),
+          id: data?._id.toString(),
           name: data.name,
           description: data.description,
           price: data.price,
@@ -502,22 +509,22 @@ export class UserService {
           userId: data.userId.toString(),
           username: user?.username,
           businessDescription: user?.businessDescription,
-          products: user?.products.map(product => product.toString()),
+          products: user?.products?.map(product => product.toString()),
           phoneNumber: user?.phoneNumber,
           email: user?.email,
           createdAt: data.createdAt,
           photo: data.photo,
           addressSeller: {
-            id: location._id.toString(),
-            name: location.name,
-            longitude: location.longitude,
-            latitude: location.latitude,
+            id: location?._id.toString(),
+            name: location?.name,
+            longitude: location?.longitude,
+            latitude: location?.latitude,
           },
         };
       }));
 
       // Calculate pagination details
-      const totalItems = await this.productModel.countDocuments({ name: new RegExp(_.trim(productName), 'i') }).exec();
+      const totalItems = await this.productModel.countDocuments({ name: new RegExp(_.trim(productName), 'i') }).session(session).exec();
       const totalPages = Math.ceil(totalItems / limit);
       const pagination = {
         totalItems,
@@ -539,30 +546,30 @@ export class UserService {
 
   private toUserDto(user: UserDocument): UserDto {
     return {
-      id: user._id.toString(),
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      phoneNumber: user.phoneNumber,
-      vehicleNumber: user.vehicleNumber,
-      isLoggedIn: user.isLoggedIn,
-      isDeleted: user.isDeleted,
-      userType: user.userType,
-      buyerStatus: user.buyerStatus,
-      sellerStatus: user.sellerStatus,
-      dispatcherStatus: user.dispatcherStatus,
-      photo: user.photo,
-      locations: user.locations.map(location => location.toString()),
-      products: user.products.map(product => product.toString()),
-      addressSeller: user.addressSeller.toString(),
-      addressBuyer: user.addressBuyer.toString(),
-      addressDispatcher: user.addressDispatcher.toString(),
-      businessDescription: user.businessDescription,
-      refreshToken: user.refreshToken,
-      role: user.role,
+      id: user?._id?.toString(),
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      username: user?.username,
+      email: user?.email,
+      createdAt: user?.createdAt,
+      updatedAt: user?.updatedAt,
+      phoneNumber: user?.phoneNumber,
+      vehicleNumber: user?.vehicleNumber,
+      isLoggedIn: user?.isLoggedIn,
+      isDeleted: user?.isDeleted,
+      userType: user?.userType,
+      buyerStatus: user?.buyerStatus,
+      sellerStatus: user?.sellerStatus,
+      dispatcherStatus: user?.dispatcherStatus,
+      photo: user?.photo,
+      locations: user?.locations.map(location => location?.toString()),
+      products: user?.products.map(product => product?.toString()),
+      addressSeller: user?.addressSeller?.toString(),
+      addressBuyer: user?.addressBuyer?.toString(),
+      addressDispatcher: user?.addressDispatcher?.toString(),
+      businessDescription: user?.businessDescription,
+      refreshToken: user?.refreshToken,
+      role: user?.role,
     };
   }
 }

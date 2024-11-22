@@ -69,7 +69,7 @@ export abstract class IMutation {
 
     abstract updateProduct(id: string, currency?: Nullable<string>, description?: Nullable<string>, name?: Nullable<string>, photo?: Nullable<string>, price?: Nullable<number>): Message | Promise<Message>;
 
-    abstract createUser(password: string, email?: Nullable<string>, phoneNumber?: Nullable<string>): Message | Promise<Message>;
+    abstract createUser(password: string, phoneNumber: string, email?: Nullable<string>): Message | Promise<Message>;
 
     abstract deleteUser(): Message | Promise<Message>;
 
