@@ -77,11 +77,17 @@ export abstract class IMutation {
 
     abstract logout(): Message | Promise<Message>;
 
+    abstract newsletter(email: string): Message | Promise<Message>;
+
+    abstract unsubcribeNewsletter(email: string, emailToken: string): Message | Promise<Message>;
+
     abstract registerUser(firstName: string, lastName: string, username: string, userType: string, email: string, phoneNumber: string, lga: string, state: string, country: string, address: string, longitude?: Nullable<string>, latitude?: Nullable<string>, vehicleNumber?: Nullable<string>): Message | Promise<Message>;
 
     abstract updatePassword(email: string, token: string, password: string): Message | Promise<Message>;
 
     abstract updateUser(firstName?: Nullable<string>, lastName?: Nullable<string>, longitude?: Nullable<string>, latitude?: Nullable<string>, userName?: Nullable<string>, lga?: Nullable<string>, state?: Nullable<string>, country?: Nullable<string>, address?: Nullable<string>, buyerStatus?: Nullable<string>, sellerStatus?: Nullable<string>, dispatcherStatus?: Nullable<string>, vehicleNumber?: Nullable<string>): Message | Promise<Message>;
+
+    abstract waitlist(email: string, lga: string, state: string, country: string, address?: Nullable<string>): Message | Promise<Message>;
 }
 
 export abstract class IQuery {
@@ -126,6 +132,8 @@ export abstract class IQuery {
     abstract user(): Message | Promise<Message>;
 
     abstract users(page?: Nullable<number>, limit?: Nullable<number>): Message | Promise<Message>;
+
+    abstract getWaitList(): Message | Promise<Message>;
 }
 
 export class Category {
@@ -244,8 +252,10 @@ export class Message {
     statesData?: Nullable<Nullable<State>[]>;
     statusCode: number;
     token?: Nullable<string>;
+    emailToken?: Nullable<string>;
     userData?: Nullable<User>;
     usersData?: Nullable<Nullable<Users>[]>;
+    waitListData?: Nullable<Nullable<WaitList>[]>;
 }
 
 export class Pagination {
@@ -303,6 +313,16 @@ export class Users {
     phoneNumber?: Nullable<string>;
     role: string;
     username?: Nullable<string>;
+}
+
+export class WaitList {
+    email: string;
+    lga: string;
+    state: string;
+    country: string;
+    createdAt?: Nullable<string>;
+    updatedAt?: Nullable<string>;
+    address?: Nullable<string>;
 }
 
 type Nullable<T> = T | null;
