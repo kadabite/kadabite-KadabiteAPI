@@ -22,6 +22,10 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { v4 as uuidv4 } from 'uuid';
 import { RedisClientType } from 'redis';
+import { NewsletterInput } from '@/user/dto/newsletter.dto';
+import { NewsletterDocument } from '@/user/schemas/newsletter.schema';
+import { WaitListDocument } from '@/user/schemas/waitlist.schema';
+import { WaitListInput } from './dto/waitlist.dto';
 
 
 @Injectable()
@@ -34,10 +38,157 @@ export class UserService {
     @InjectModel('Lga') private lgaModel: Model<LgaDocument>,
     @InjectModel('Location') private locationModel: Model<LocationDocument>,
     @InjectModel('Product') private productModel: Model<ProductDocument>,
+    @InjectModel('Newsletter') private newsletterModel: Model<NewsletterDocument>,
+    @InjectModel('WaitList') private waitListModel: Model<WaitListDocument>,
     @InjectConnection() private readonly connection: Connection,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('REDIS_CLIENT') private redisClient: RedisClientType,
   ) {}
+
+  async addUserToNewsletter(newsletterInput: NewsletterInput, userId: string): Promise<MessageDto> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const { email } = newsletterInput;
+      const user = !!userId;
+
+      const verifyEmail = await this.newsletterModel.findOne({ email }).session(session).exec();
+      if (verifyEmail){
+        return {
+          message: 'Email already exist in newsletter list',
+          statusCode: 200,
+          ok: true
+        }
+      }
+
+      const token = uuidv4();
+      const newEmail = new this.newsletterModel({
+        email,
+        emailToken: token,
+        isRegistered: user,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      await newEmail.save({ session });
+
+      await session.commitTransaction();
+      return {
+        message: 'Email has been added to newsletter list',
+        statusCode: 201,
+        ok: true,
+        emailToken: token
+      }
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Error adding email to newsletter: ' + (error as Error).message);
+      return { message: 'An error occurred!', statusCode: 500, ok: false };
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async removeUserFromNewsletter(email: string, emailToken: string): Promise<MessageDto> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const verifyEmail = await this.newsletterModel.findOne({ email }).session(session).exec();
+      if (!verifyEmail) {
+        throw new InvalidCredentialsError('Email does not exist!');
+      }
+      if (verifyEmail.emailToken !== emailToken) {
+        throw new InvalidCredentialsError('Token is not valid!');
+      }
+      await this.newsletterModel.deleteOne({ email }).session(session).exec();
+
+      await session.commitTransaction()
+
+      return {
+        message: 'You have successfully unsubscribed from Kadabite newsletter!',
+        ok: true,
+        statusCode: 201
+      }
+    } catch (error) {
+      await session.abortTransaction()
+      this.logger.error('Error removing unsubscribing user! ' + (error as Error).message);
+
+      if (error instanceof InvalidCredentialsError) {
+        return { message: error.message, statusCode: 400, ok: false };
+      }
+      return {
+        message: 'An error occurred somewhere',
+        statusCode: 500,
+        ok: false
+      };
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async addUserToWaitList(waitlist: WaitListInput): Promise<MessageDto> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      let { email, lga, state, country, address } = waitlist;
+      address = address.replace(/,/g, ' ').trim();
+      const addressLocation = `${_.trim(address)}, ${_.trim(lga)}, ${_.trim(state)}, ${_.trim(country)}`;
+
+      const verifyEmail = await this.waitListModel.findOne({ email }).session(session).exec();
+      if (verifyEmail){
+        return {
+          message: 'Email already exist in waitlist',
+          statusCode: 200,
+          ok: true
+        }
+      }
+
+      const newEmail = new this.waitListModel({
+        email,
+        location: addressLocation,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      await newEmail.save({ session });
+
+      await session.commitTransaction();
+      return {
+        message: 'Email has been added to waitlist',
+        statusCode: 201,
+        ok: true
+      }     
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Error adding email to waitlist: ' + (error as Error).message);
+      return { message: 'An error occurred!', statusCode: 500, ok: false };
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async getWaitList(): Promise<MessageDto> {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      const waitListData = await this.waitListModel.find().session(session).exec();
+      if (!waitListData) {
+        return {
+          message: 'No user in wait List yet',
+          ok: true,
+          statusCode: 200
+        }
+      }
+      await session.commitTransaction();
+      return { waitListData, statusCode: 200, ok: true };
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Error fetching wait list: ' + (error as Error).message);
+      return { message: 'An error occurred!', statusCode: 500, ok: false };
+    } finally {
+      session.endSession();
+    }
+  }
 
   async create(createUserInput: CreateUserInput): Promise<MessageDto> {
     const session = await this.connection.startSession();
@@ -215,6 +366,7 @@ export class UserService {
         buyerStatus,
         sellerStatus,
         dispatcherStatus,
+        updatedAt: new Date(),
       };
 
       // Filter out undefined values
