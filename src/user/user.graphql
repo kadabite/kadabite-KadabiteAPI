@@ -22,8 +22,10 @@ type Message {
   statesData: [State]
   statusCode: Int!
   token: String
+  emailToken: String
   userData: User
   usersData: [Users]
+  waitListData: [WaitList]
 }
 
 type Mutation {
@@ -35,6 +37,8 @@ type Mutation {
   deleteUser: Message!
   forgotPassword(email: String!): Message!
   logout: Message!
+  newsletter(email: String!): Message!
+  unsubcribeNewsletter(email: String!, emailToken: String!): Message!
   registerUser(
     firstName: String!
     lastName: String!
@@ -66,6 +70,12 @@ type Mutation {
     dispatcherStatus: String
     vehicleNumber: String
   ): Message!
+  waitlist(
+    email: String!,
+    lga: String!,
+    state: String!,
+    country: String!,
+    address: String): Message!
 }
 
 type Pagination {
@@ -79,6 +89,7 @@ type Query {
   findFoods(productName: String!, page: Int, limit: Int): Message!
   user: Message!
   users(page: Int, limit: Int): Message!
+  getWaitList: Message!
 }
 
 type Restaurant {
@@ -129,4 +140,14 @@ type Users {
   phoneNumber: String
   role: String!
   username: String
+}
+
+type WaitList {
+  email: String!,
+  lga: String!,
+  state: String!,
+  country: String!,
+  createdAt: String,
+  updatedAt: String,
+  address: String
 }
