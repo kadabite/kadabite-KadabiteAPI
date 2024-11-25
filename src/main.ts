@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'fatal', 'debug', 'log']
   });
-  const allowlist = [process.env.FRONTEND_URL, 'http://example2.com'];
+  const allowlist = [process.env.FRONTEND_URL, 'http://example2.com', 'https://studio.apollographql.com', '*','http://localhost:3000'];
   const corsOptionDelegate = function (req, callback) {
     let corsOptions;
     if (allowlist.indexOf(req.header('Origin')) !== -1) {
