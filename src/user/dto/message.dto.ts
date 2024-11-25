@@ -13,6 +13,7 @@ import { StateDto } from '@/location/dto/state.dto';
 import { UserDto } from '@/user/dto/user.dto';
 import { UsersDto } from '@/user/dto/users.dto';
 import { IsUUID, IsString } from 'class-validator';
+import { WaitListDto } from '@/user/dto/waitlist.dto';
 
 @ObjectType()
 export class MessageDto {
@@ -80,6 +81,9 @@ export class MessageDto {
   @Field(() => [ProductDto], { nullable: true })
   productsData?: ProductDto[];
 
+  @Field(() => [WaitListDto], { nullable: true })
+  waitListData?: WaitListDto[];
+
   @Field({ nullable: true })
   @IsString()
   refreshToken?: string;
@@ -93,6 +97,10 @@ export class MessageDto {
   @Field({ nullable: true })
   @IsString()
   token?: string;
+
+  @Field({ nullable: true })
+  @IsUUID()
+  emailToken?: string;
 
   @Field(() => UserDto, { nullable: true })
   userData?: UserDto;
