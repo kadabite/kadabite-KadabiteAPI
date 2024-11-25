@@ -9,6 +9,8 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { FindFoodsInput } from '@/user/dto/find-foods.input';
 import { UpdatePasswordInput } from '@/user/dto/update-password.input';
 import { ForgotPasswordInput } from '@/user/dto/forgot-password.input';
+import { NewsletterInput } from './dto/newsletter.dto';
+import { WaitListInput } from './dto/waitlist.dto';
 
 @Resolver(() => MessageDto)
 export class UserResolver {
@@ -40,6 +42,33 @@ export class UserResolver {
     return this.userService.logout(userId);
   }
 
+  @Mutation(() => MessageDto, { description: 'add user to recieve newletter', name: 'newsletter'})
+  addUserToNewsletter(
+    @Args() newsletterInput: NewsletterInput,
+    @Context() context
+  ) {
+    const userId = context.req?.user?.sub;
+    return this.userService.addUserToNewsletter(newsletterInput, userId);
+  }
+
+  @Mutation(() => MessageDto, { description: 'add user to waitlist', name: 'waitlist' })
+  addUserToWaitlist(
+    @Args() waitlist: WaitListInput,
+  ) {
+    return this.userService.addUserToWaitList(waitlist);
+  }
+
+  @Mutation(() => MessageDto, {
+    description: 'Remove user from recieving newsletter',
+    name: 'unsubcribeNewsletter'
+  })
+  removeUserFromNewsletter(
+    @Args() remNewslettersub: NewsletterInput,
+  ) {
+    const { email, emailToken } = remNewslettersub;
+    return this.userService.removeUserFromNewsletter(email, emailToken);
+  }
+
   @Mutation(() => MessageDto, { description: 'Register a new user' })
   @UseGuards(AuthGuard)
   registerUser(
@@ -67,6 +96,11 @@ export class UserResolver {
   ) {
     const userId = context.req.user.sub;
     return this.userService.update(userId, updateUserInput);
+  }
+
+  @Query(() => MessageDto, { name: 'getWaitList', description: 'Get a list of all users in wait list' })
+  getWaitList() {
+    return this.userService.getWaitList();
   }
 
   @Query(() => MessageDto, { name: 'user', description: 'Find a user by ID' })
