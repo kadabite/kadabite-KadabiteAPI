@@ -3,10 +3,12 @@ import { UserService } from '@/user/user.service';
 import { UserResolver } from '@/user/user.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema, UserDocument } from '@/user/schemas/user.schema';
+import { WaitList, WaitListSchema } from '@/user/schemas/waitlist.schema';
 import * as bcrypt from 'bcrypt';
 import { AuthModule } from '@/auth/auth.module';
 import { LocationModule } from '@/location/location.module';
 import { ProductModule } from '@/product/product.module';
+import { Newsletter, NewsletterSchema } from '@/user/schemas/newsletter.schema';
 
 @Module({
   providers: [UserResolver, UserService],
@@ -26,6 +28,14 @@ import { ProductModule } from '@/product/product.module';
             });
             return schema;
           }
+        },
+        {
+          name: WaitList.name,
+          useFactory: () => WaitListSchema,
+        },
+        {
+          name: Newsletter.name,
+          useFactory: () => NewsletterSchema,
         }
       ]),
     forwardRef(() => AuthModule),
