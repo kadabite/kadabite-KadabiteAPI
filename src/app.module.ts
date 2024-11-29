@@ -28,8 +28,9 @@ import * as cookieParser from 'cookie-parser';
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class',
       },
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      playground: process.env.NODE_ENV !== 'production',
+      introspection: process.env.NODE_ENV !== 'production',
+      // plugins: [ApolloServerPluginLandingPageLocalDefault()],
       include: [UserModule, ProductModule, PaymentModule, OrderModule, LocationModule, CategoryModule],
     }),
     UserModule,
@@ -45,7 +46,7 @@ import * as cookieParser from 'cookie-parser';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-    .apply(cookieParser(), RefererOriginMiddleware)
-    .forRoutes('*');
+      .apply()
+      .forRoutes('*');
   }
 }

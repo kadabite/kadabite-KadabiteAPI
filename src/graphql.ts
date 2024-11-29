@@ -317,12 +317,9 @@ export class Users {
 
 export class WaitList {
     email: string;
-    lga: string;
-    state: string;
-    country: string;
+    location?: Nullable<string>;
     createdAt?: Nullable<string>;
     updatedAt?: Nullable<string>;
-    address?: Nullable<string>;
 }
 
 type Nullable<T> = T | null;

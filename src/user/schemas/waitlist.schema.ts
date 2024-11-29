@@ -9,7 +9,7 @@ export class WaitList {
   @Prop({ unique: true, collation: { locale: 'en', strength: 2 }, maxlength: 100 })
   email: string;
 
-  @Prop({ maxlength: 200 })
+  @Prop({ maxlength: 400 })
   location?: string;
 
   @Prop({ default: new Date() })

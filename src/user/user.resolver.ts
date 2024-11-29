@@ -16,7 +16,7 @@ import { WaitListInput } from './dto/waitlist.dto';
 export class UserResolver {
   constructor(
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   @Mutation(() => MessageDto, { description: 'Create a new user' })
   createUser(@Args() createUserInput: CreateUserInput) {
@@ -42,7 +42,7 @@ export class UserResolver {
     return this.userService.logout(userId);
   }
 
-  @Mutation(() => MessageDto, { description: 'add user to recieve newletter', name: 'newsletter'})
+  @Mutation(() => MessageDto, { description: 'add user to recieve newletter', name: 'newsletter' })
   addUserToNewsletter(
     @Args() newsletterInput: NewsletterInput,
     @Context() context

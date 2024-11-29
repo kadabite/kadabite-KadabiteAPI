@@ -16,7 +16,7 @@ import { LgaNotFoundError } from '@/common/custom-errors/location/lga-not-found.
 import { LocationNotFoundError } from '@/common/custom-errors/location/location-not-found.error';
 import { DeletionError } from '@/common/custom-errors/location/deletion.error';
 import { Connection } from 'mongoose';
-import { Addresses }  from '@/common/util/locations';
+import { Addresses } from '@/common/util/locations';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class LocationService {
     @InjectModel('Lga') private lgaModel: Model<LgaDocument>,
     @InjectModel('User') private userModel: Model<UserDocument>,
     @InjectConnection() private readonly connection: Connection,
-  ) {}
+  ) { }
   private readonly logger = new Logger(LocationService.name);
 
   async create(createLocationInput: string, addressesData: Addresses): Promise<MessageDto> {
@@ -270,20 +270,20 @@ export class LocationService {
         const parsedData = JSON.parse(cache as string);
         return { lgasData: parsedData, statusCode: 200, ok: true };
       }
-  
+
       // Fetch state data from the database
-      const stateData = await this.stateModel.findOne({ state }).populate<{ lgas: LgaDocument[] }>('lgas').exec();
+      const stateData = await this.stateModel.findOne({ name: state }).populate<{ lgas: LgaDocument[] }>('lgas').exec();
       if (!stateData) return { message: 'State not found!', statusCode: 404, ok: false };
-  
+
       // Transform the data
       const lgasData = stateData.lgas.map((lga: LgaDocument) => ({
         id: lga._id.toString(),
         name: lga.name,
       }));
-  
+
       // Save the data in the cache for 24 hours (86400 seconds)
       await this.cacheManager.set(state, JSON.stringify(lgasData));
-  
+
       return { lgasData, statusCode: 200, ok: true };
     } catch (error) {
       this.logger.error('Error fetching lgas: ' + (error as Error).message);
@@ -299,20 +299,20 @@ export class LocationService {
         const parsedData = JSON.parse(cache as string);
         return { statesData: parsedData, statusCode: 200, ok: true };
       }
-  
+
       // Fetch country data from the database
       const countryData = await this.countryModel.findOne({ name: country }).populate<{ states: StateDocument[] }>('states').exec();
       if (!countryData) return { message: 'Country not found!', statusCode: 404, ok: false };
-  
+
       // Transform the data
       const statesData = countryData.states.map((state: StateDocument) => ({
         id: state._id.toString(),
         name: state.name,
       }));
-  
+
       // Save the data in the cache for 24 hours (86400 seconds)
       await this.cacheManager.set(country, JSON.stringify(statesData));
-  
+
       return { statesData, statusCode: 200, ok: true };
     } catch (error) {
       this.logger.error('Error fetching states: ' + (error as Error).message);
@@ -323,9 +323,9 @@ export class LocationService {
   async getUserLocations(userId: string): Promise<MessageDto> {
     try {
       // Fetch user data from the database
-      const userInfo = await this.userModel.findById(userId).populate<{ locations: LocationDocument[]}>('locations').exec();
+      const userInfo = await this.userModel.findById(userId).populate<{ locations: LocationDocument[] }>('locations').exec();
       if (!userInfo) return { message: 'User not found!', statusCode: 404, ok: false };
-  
+
       // Transform the data
       const locationsData = userInfo.locations.map((location: LocationDocument) => ({
         id: location._id.toString(),
@@ -333,7 +333,7 @@ export class LocationService {
         longitude: location.longitude,
         latitude: location.latitude,
       }));
-  
+
       return { locationsData, statusCode: 200, ok: true };
     } catch (error) {
       this.logger.error('Error fetching user locations: ' + (error as Error).message);

@@ -43,7 +43,7 @@ export class UserService {
     @InjectConnection() private readonly connection: Connection,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject('REDIS_CLIENT') private redisClient: RedisClientType,
-  ) {}
+  ) { }
 
   async addUserToNewsletter(newsletterInput: NewsletterInput, userId: string): Promise<MessageDto> {
     const session = await this.connection.startSession();
@@ -53,7 +53,7 @@ export class UserService {
       const user = !!userId;
 
       const verifyEmail = await this.newsletterModel.findOne({ email }).session(session).exec();
-      if (verifyEmail){
+      if (verifyEmail) {
         return {
           message: 'Email already exist in newsletter list',
           statusCode: 200,
@@ -132,16 +132,14 @@ export class UserService {
       let { email, lga, state, country, address } = waitlist;
       address = address.replace(/,/g, ' ').trim();
       const addressLocation = `${_.trim(address)}, ${_.trim(lga)}, ${_.trim(state)}, ${_.trim(country)}`;
-
       const verifyEmail = await this.waitListModel.findOne({ email }).session(session).exec();
-      if (verifyEmail){
+      if (verifyEmail) {
         return {
           message: 'Email already exist in waitlist',
           statusCode: 200,
           ok: true
         }
       }
-
       const newEmail = new this.waitListModel({
         email,
         location: addressLocation,
@@ -150,13 +148,13 @@ export class UserService {
       });
 
       await newEmail.save({ session });
-
+      console.log('i finally got here!');
       await session.commitTransaction();
       return {
         message: 'Email has been added to waitlist',
         statusCode: 201,
         ok: true
-      }     
+      }
     } catch (error) {
       await session.abortTransaction();
       this.logger.error('Error adding email to waitlist: ' + (error as Error).message);
@@ -180,7 +178,7 @@ export class UserService {
         }
       }
       await session.commitTransaction();
-      return { waitListData, statusCode: 200, ok: true };
+      return { waitListData, statusCode: 200, ok: true, message: 'success!' };
     } catch (error) {
       await session.abortTransaction();
       this.logger.error('Error fetching wait list: ' + (error as Error).message);
