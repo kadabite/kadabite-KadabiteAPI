@@ -4,14 +4,14 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY . .
+# Copy the requirements.txt file into the container
+COPY requirements.txt ./
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Define environment variable
-ENV NAME EmailService
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
 
 # Run worker.py when the container launches
 CMD ["python", "worker.py"]

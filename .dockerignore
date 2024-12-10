@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.vscode
+.husky
+Dockerfile
+docker-compose.yaml
+redis-data
+email_service
+dist
+database_mongo
+Next_fullStack_food_Delivery_app
