@@ -8,7 +8,7 @@
 	"license": "ISC",
 	"scripts": {
 		"build": "nest build",
-		"start": "node dist/src/main.js",
+		"start": "pm2 start dist/src/main.js --name kadabites-app",
 		"start:dev": "nest start --watch",
 		"test": "jest",
 		"test:watch": "jest --watch",
