@@ -11,6 +11,7 @@ async function bootstrap() {
     process.env.FRONTEND_URL,
     'https://studio.apollographql.com',
     '*',
+    'https://www.kadabite.com',
     'http://localhost:3000',
     'http://localhost:4000',
   ];
@@ -24,6 +25,7 @@ async function bootstrap() {
         methods: 'GET,POST', // Allow GET and POST methods
         allowedHeaders: 'Content-Type, Authorization', // Allow specific headers
         credentials: true, // Allow cookies (if needed)
+        exposedHeaders: 'Access-Control-Allow-Origin', // Expose the Access-Control-Allow-Origin header
       };
     } else {
       corsOptions = { origin: false }; // Deny CORS for other origins
